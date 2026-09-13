@@ -19,7 +19,7 @@
  * reloads on network switch); remount with a `key` to change networks.
  */
 
-import { createContext, type ReactNode, useContext, useMemo, useState } from "react";
+import { type ReactNode, createContext, useContext, useMemo, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { Avantis } from "../client.js";
 import type { AvantisConfigInput } from "../config.js";

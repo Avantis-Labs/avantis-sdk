@@ -1,0 +1,31 @@
+# avantis-sdk
+
+> Official TypeScript SDK for Avantis v2 perpetuals on Base (chain 8453).
+> viem-based, API-first (no ABIs). Gasless trading through the Avantis
+> relayer via signed EIP-712 intents; EIP-7702 smart-account relays;
+> optional direct mode. React hooks at `avantis-sdk/react` (wagmi v2 +
+> TanStack Query v5). Full parity with the Python avantis-trader-sdk.
+
+## Start here
+
+- AGENTS.md: invariants, execution routing, signing rules — read first.
+- README.md: install + backend/React quickstarts.
+- examples/: 21 runnable scripts (01–21) + examples/next-app trading panel.
+
+## Key facts
+
+- `new Avantis()` reads AVANTIS_PRIVATE_KEY / AVANTIS_TRADER_ADDRESS /
+  AVANTIS_NETWORK from env; browsers pass `{ signer: walletClient }`.
+- Human units everywhere: collateral 100 = 100 USDC, leverage 10 = 10x,
+  prices plain decimals. deadlines are MILLISECONDS, delegate expiry is
+  SECONDS.
+- Namespaces: trade, account, markets, info, referral, lp; pure math in
+  the `compute` export.
+- Market opens/closes/increases stream a lifecycle (MarketOrderAccepted ->
+  AttemptFailed* -> MarketOrderExecuted | MarketOrderCanceled | Error).
+  Error payloads carry a machine `code` (e.g. WrongSl, NO_PRICE).
+- TP/SL: `trade.updateTpSl` (global, on-chain; 0 clears/resets),
+  `trade.partialTpSl` CRUD (off-chain triggers with entityId).
+- Session keys: react `useSessionKey()` or `account.registerDelegate` —
+  delegate keys trade only, never move funds.
+- Never bypass the digest assert in signing; never rename EIP-712 fields.

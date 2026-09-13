@@ -60,11 +60,9 @@ export function useSessionKey(): UseSessionKeyResult {
   const { data: walletClient } = useWalletClient();
   const queryClient = useQueryClient();
 
-  const record = useMemo(
-    () => (address ? readSessionKeyRaw(network, address) : null),
-    // biome-ignore lint/correctness/useExhaustiveDependencies: storage revision is tracked by the provider
-    [network, address],
-  );
+  // Storage revision changes re-render the provider tree, so a plain read
+  // here stays fresh without memoization.
+  const record = address ? readSessionKeyRaw(network, address) : null;
 
   // Verify on-chain state for stored keys (registration can be revoked
   // elsewhere, e.g. the Avantis UI).
