@@ -1,0 +1,118 @@
+{
+  "name": "avantis-sdk",
+  "version": "0.1.0",
+  "description": "Official TypeScript SDK for Avantis v2 - perpetuals on Base. viem-based, API-first (no ABIs), gasless via the Avantis relayer, with React hooks at avantis-sdk/react.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "react": [
+        "./dist/react/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "AGENTS.md",
+    "llms.txt",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src tests",
+    "lint:fix": "biome check --write src tests",
+    "check:package": "pnpm build && publint && attw --pack .",
+    "changeset": "changeset",
+    "release": "pnpm build && changeset publish"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": ">=5",
+    "react": ">=18",
+    "socket.io-client": ">=4",
+    "viem": ">=2.28.0",
+    "wagmi": ">=2.12"
+  },
+  "peerDependenciesMeta": {
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "socket.io-client": {
+      "optional": true
+    },
+    "wagmi": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@biomejs/biome": "^1.9.4",
+    "@changesets/cli": "^2.27.9",
+    "@tanstack/react-query": "^5.62.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "publint": "^0.2.12",
+    "react": "^18.3.1",
+    "socket.io-client": "^4.8.3",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "viem": "^2.40.0",
+    "vitest": "^2.1.8",
+    "wagmi": "^2.15.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "avantis",
+    "perpetuals",
+    "trading",
+    "base",
+    "viem",
+    "wagmi",
+    "defi",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Avantis-Labs/avantis-sdk.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.19.0+sha512.c9fc7236e92adf5c8af42fd5bf1612df99c2ceb62f27047032f4720b33f8eacdde311865e91c411f2774f618d82f320808ecb51718bfa82c060c4ba7c76a32b8"
+}
