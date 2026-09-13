@@ -36,7 +36,10 @@ const refreshed = await client.account.positions();
 const pos = refreshed.positions.find(
   (p) => p.pairIndex === position.pairIndex && p.index === position.index,
 );
-console.log("partial triggers:", partialTriggers(pos!).map((t) => t.entityId));
+console.log(
+  "partial triggers:",
+  partialTriggers(pos!).map((t) => t.entityId),
+);
 
 // Cancel the partial trigger:
 await client.trade.cancelPartialTpSl(stored.entityId as string);

@@ -29,7 +29,15 @@ export {
   PROFILES,
   resolveConfig,
   TESTNET,
+  TESTNET_RPC_URL,
 } from "./config.js";
+
+// testnet faucet (fork devnet only)
+export {
+  type FundTestnetWalletResult,
+  fundTestnetWallet,
+  TESTNET_EXPLORER_URL,
+} from "./testnet.js";
 
 // errors
 export {

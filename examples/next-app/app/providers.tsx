@@ -20,6 +20,9 @@ const wagmiConfig = createConfig({
   chains: [base],
   connectors: [injected()],
   transports: { [base.id]: http() },
+  // Testnet (Avantis Base fork, same chainId): point BOTH layers at it —
+  //   transports: { [base.id]: http(TESTNET_RPC_URL) }   (TESTNET_RPC_URL from "avantis-sdk")
+  //   <AvantisProvider network="testnet">
 });
 
 export function Providers({ children }: { children: ReactNode }) {

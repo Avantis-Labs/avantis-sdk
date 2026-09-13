@@ -19,15 +19,22 @@
  * reloads on network switch); remount with a `key` to change networks.
  */
 
-import { type ReactNode, createContext, useContext, useMemo, useState } from "react";
+import { type ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAccount, useWalletClient } from "wagmi";
 import { Avantis } from "../client.js";
 import type { AvantisConfigInput } from "../config.js";
-import { PriceFeedStore } from "./priceFeed.js";
+import { PriceFeedStore, type PriceTransport } from "./priceFeed.js";
 import { readSessionKey, sessionSignerFromKey, useSessionKeyRevision } from "./sessionStore.js";
 
 export interface AvantisProviderProps extends AvantisConfigInput {
   children: ReactNode;
+  /**
+   * Live-price transport: "worker" (default) runs the SSE stream + parsing
+   * in a Web Worker like the production Avantis UI (keeps heavy tick
+   * traffic off the main thread); "main" streams on the main thread.
+   * Falls back to "main" automatically when Workers are unavailable.
+   */
+  priceTransport?: PriceTransport;
 }
 
 export interface AvantisContextValue {
@@ -43,14 +50,19 @@ export interface AvantisContextValue {
 
 const AvantisContext = createContext<AvantisContextValue | null>(null);
 
-export function AvantisProvider({ children, ...config }: AvantisProviderProps) {
+export function AvantisProvider({ children, priceTransport, ...config }: AvantisProviderProps) {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
 
   // Config is captured once; remount the provider (key prop) to change it.
   const [initialConfig] = useState<AvantisConfigInput>(() => ({ ...config }));
+  const [initialTransport] = useState<PriceTransport>(() => priceTransport ?? "worker");
   const readClient = useMemo(() => new Avantis(initialConfig), [initialConfig]);
-  const priceFeed = useMemo(() => new PriceFeedStore(readClient), [readClient]);
+  const priceFeed = useMemo(
+    () => new PriceFeedStore(readClient, initialTransport),
+    [readClient, initialTransport],
+  );
+  useEffect(() => () => priceFeed.destroy(), [priceFeed]);
 
   // Re-render on session-key storage changes, then re-read the record.
   useSessionKeyRevision();

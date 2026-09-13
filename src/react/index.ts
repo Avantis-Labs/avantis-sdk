@@ -17,7 +17,8 @@ export {
   useAvantis,
   useAvantisContext,
 } from "./provider.js";
-export type { LivePrice } from "./priceFeed.js";
+export type { LivePrice, PriceTransport } from "./priceFeed.js";
+export { createPriceWorker, supportsPriceWorker } from "./priceWorker.js";
 
 // reads
 export {

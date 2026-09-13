@@ -87,6 +87,25 @@ Service URLs derive from apiBaseUrl (prod-api/staging-api.avantisfi.com):
    optional peers used only by `avantis-sdk/react`; socket.io-client is an
    optional peer used only by PairDataStream.
 
+## Testnet
+
+`network: "testnet"` = internal Base fork (chainId 8453, same contract
+addresses; staging service URLs; `rpcUrl` auto-defaults to the public fork
+RPC). `fundTestnetWallet(address)` faucet-funds any wallet via the fork's
+`dev_impersonateTransaction` (fork-only; refuses non-testnet RPCs). The
+zero-setup path is examples/00_testnet_quickstart.ts; the live round-trip
+suite is `pnpm test:e2e` (tests/e2e/testnet.e2e.test.ts, gated by
+AVANTIS_E2E=1 — it covers blitz 7702 approve, batched-market SSE
+open/close, and price-triggers TP against staging).
+
+## Live prices in UIs
+
+`usePrice` fans one Lazer SSE stream out of a Web Worker by default
+(react/priceWorker.ts spawns it from an inline Blob; in-worker EventSource
+reconnects natively). Fallback to the main-thread stream is automatic;
+`priceTransport="main"` on AvantisProvider forces it. Keep the worker
+source self-contained (no imports) so it needs no bundler support.
+
 ## When Modifying
 - Keep the core isomorphic: fetch/ReadableStream only, no Node-only APIs
   outside guarded fallbacks (streams/ws.ts).

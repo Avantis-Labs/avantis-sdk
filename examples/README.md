@@ -13,6 +13,7 @@ pnpm tsx examples/05_open_market_trade.ts
 
 | # | file | shows |
 |---|------|-------|
+| 00 | 00_testnet_quickstart.ts | ZERO-SETUP testnet: faucet-fund a fresh wallet and trade |
 | 01 | 01_configure_and_meta.ts | config resolution + /v2/meta bootstrap |
 | 02 | 02_markets_info.ts | pair catalog, leverage envelopes, fees |
 | 03 | 03_prices_and_spread.ts | live price + risk-engine v2 spread |

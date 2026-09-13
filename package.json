@@ -49,6 +49,7 @@
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "AVANTIS_E2E=1 vitest run tests/e2e --no-file-parallelism",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src tests",
     "lint:fix": "biome check --write src tests",

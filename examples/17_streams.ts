@@ -14,7 +14,9 @@ const feedIds = [eth.lazerFeed?.feedId, btc.lazerFeed?.feedId].filter(
 const stream = client.lazerPriceStream(feedIds);
 let ticks = 0;
 void stream.run((update) => {
-  console.log(`feed ${update.feedId}: ${update.price} (bid ${update.bestBid} ask ${update.bestAsk})`);
+  console.log(
+    `feed ${update.feedId}: ${update.price} (bid ${update.bestBid} ask ${update.bestAsk})`,
+  );
   if (++ticks >= 10) stream.stop();
 });
 

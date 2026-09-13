@@ -35,6 +35,13 @@ describe("resolveConfig", () => {
     expect(config.txBuilderUrl).toBe("https://tx-builder-testnet.avantisfi.com");
     expect(config.coreApiUrl).toBe("https://staging-api.avantisfi.com/core");
     expect(config.pusherKey).toBe("f86bc7e9919fc938694a");
+    // Testnet DX: the public fork RPC is defaulted in (explicit still wins).
+    expect(config.rpcUrl).toBe("https://base-testnet-rpc-ovh.avantisfi.com");
+    expect(resolveConfig({ network: "testnet", rpcUrl: "http://x" }).rpcUrl).toBe("http://x");
+  });
+
+  it("mainnet stays RPC-less by default", () => {
+    expect(resolveConfig().rpcUrl).toBeUndefined();
   });
 
   it("env overrides beat profile; explicit input beats env", () => {

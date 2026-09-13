@@ -15,6 +15,10 @@ avantis-trader-sdk.
   core price-triggers, twap-app, direct RPC, capability-aware wallet
   fallback for browser signers.
 - React (`avantis-sdk/react`): AvantisProvider, live price hook (shared
-  Lazer SSE), positions/history/allowance queries, trading mutations with
-  lifecycle events, `useSessionKey` one-click trading, permit-gasless USDC
+  Lazer SSE running in a Web Worker by default, main-thread fallback),
+  positions/history/allowance queries, trading mutations with lifecycle
+  events, `useSessionKey` one-click trading, permit-gasless USDC
   approvals, builder-code hooks.
+- Testnet: `fundTestnetWallet` dev faucet, auto-defaulted fork RPC,
+  zero-setup quickstart (examples/00) and a live e2e suite
+  (`pnpm test:e2e`) covering approve -> open -> TP -> close on staging.

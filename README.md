@@ -46,6 +46,30 @@ Gasless by default: no RPC, no ETH. Get an API (delegate) key at
 [delegate.avantisfi.com](https://delegate.avantisfi.com) or with
 `examples/11_delegate_onboarding.ts`.
 
+## Try it on testnet in 60 seconds
+
+The Avantis testnet is a fork of Base (same chainId 8453, same contracts)
+with a built-in dev faucet — no keys to source, no faucet sites:
+
+```ts
+import { Avantis, fundTestnetWallet } from "avantis-sdk";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+
+const key = generatePrivateKey();
+await fundTestnetWallet(privateKeyToAccount(key).address); // 0.05 ETH + 1,000 USDC
+
+const client = new Avantis({ network: "testnet", signer: key });
+await client.account.approveUsdc(); // gasless
+await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 5 });
+```
+
+Or just run the script: `pnpm tsx examples/00_testnet_quickstart.ts`.
+`network: "testnet"` rebinds every service URL to the staging stack and
+defaults `rpcUrl` to the fork RPC; for browser apps point your wagmi
+transport at `TESTNET_RPC_URL` (imported from `avantis-sdk`) so on-chain
+reads hit the fork too. The faucet only exists on the fork — mainnet is
+never touched.
+
 ## React quickstart
 
 ```tsx
@@ -71,6 +95,14 @@ function Trade() {
 Works with every wagmi-compatible wallet layer (RainbowKit, ConnectKit,
 Privy, Reown AppKit, plain injected). A complete trading panel lives in
 [`examples/next-app`](./examples/next-app).
+
+`usePrice` streams over one shared SSE connection that runs **inside a Web
+Worker by default** (same pattern as the production Avantis UI): tick
+parsing and fan-out stay off the main thread, so charts and forms keep
+rendering smoothly under heavy price traffic. No bundler config needed (the
+worker spawns from an inline Blob); it falls back to a main-thread stream
+under SSR or strict CSPs, and `priceTransport="main"` on the provider
+forces the fallback.
 
 ## The pieces
 
@@ -122,7 +154,8 @@ first — it carries the invariants and routing rules.
 
 ```bash
 pnpm install
-pnpm test            # 64 tests incl. golden-vector + EIP-7702 byte parity
+pnpm test            # unit tests incl. golden-vector + EIP-7702 byte parity
+pnpm test:e2e        # live testnet round trip (fund -> approve -> open -> TP -> close)
 pnpm typecheck && pnpm lint
 pnpm check:package   # publint + arethetypeswrong
 ```

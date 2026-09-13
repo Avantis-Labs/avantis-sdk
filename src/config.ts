@@ -87,6 +87,14 @@ export const TESTNET: NetworkProfile = {
   pusherCluster: "mt1",
 };
 
+/**
+ * Externally reachable RPC of the testnet fork (chainId 8453, same
+ * addresses as Base mainnet). Filled in as the default `rpcUrl` on the
+ * testnet profile so trader-EOA flows (EIP-7702 auth nonce, direct mode)
+ * work out of the box.
+ */
+export const TESTNET_RPC_URL = "https://base-testnet-rpc-ovh.avantisfi.com";
+
 export const MAINNET: NetworkProfile = {
   name: "mainnet",
   apiBaseUrl: "https://prod-api.avantisfi.com",
@@ -251,7 +259,12 @@ export function resolveConfig(input: AvantisConfigInput = {}): AvantisConfig {
     privateKey: input.privateKey ?? (env("AVANTIS_PRIVATE_KEY") as Hex | undefined),
     trader: input.trader ?? (env("AVANTIS_TRADER_ADDRESS") as Address | undefined),
     execution: input.execution ?? (executionEnv as ExecutionMode | undefined) ?? "relayer",
-    rpcUrl: input.rpcUrl ?? env("AVANTIS_RPC_URL"),
+    rpcUrl:
+      input.rpcUrl ??
+      env("AVANTIS_RPC_URL") ??
+      // Testnet DX: the fork RPC is public, so default it in. Mainnet stays
+      // RPC-less by default (delegate keys need none).
+      (network === "testnet" ? TESTNET_RPC_URL : undefined),
 
     network,
     apiBaseUrl: urls.apiBaseUrl,
