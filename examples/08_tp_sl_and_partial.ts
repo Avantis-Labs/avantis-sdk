@@ -1,9 +1,9 @@
 /**
  * TP/SL management.
  *
- * - GLOBAL (on-chain) TP/SL: trade.updateTpSl — undefined keeps a leg,
+ * - GLOBAL (on-chain) TP/SL: trade.updateTpSl, undefined keeps a leg,
  *   0 clears it (tp=0 resets to the pair's max-gain cap).
- * - PARTIAL (off-chain) triggers: trade.partialTpSl CRUD — stored with the
+ * - PARTIAL (off-chain) triggers: trade.partialTpSl CRUD, stored with the
  *   operator, executed when the trigger price hits. Keep the entityId.
  */
 

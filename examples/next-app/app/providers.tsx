@@ -4,7 +4,7 @@
  * Provider stack: WagmiProvider -> QueryClientProvider -> VerantaProvider.
  *
  * Works with ANY wagmi-compatible wallet layer: swap `injected()` for
- * RainbowKit, ConnectKit, Privy, Reown AppKit connectors — the Veranta
+ * RainbowKit, ConnectKit, Privy, Reown AppKit connectors, the Veranta
  * hooks don't care which one you use.
  */
 
@@ -20,7 +20,7 @@ const wagmiConfig = createConfig({
   chains: [base],
   connectors: [injected()],
   transports: { [base.id]: http() },
-  // Testnet (Veranta Base fork, same chainId): point BOTH layers at it —
+  // Testnet (Veranta Base fork, same chainId): point BOTH layers at it,
   //   transports: { [base.id]: http(TESTNET_RPC_URL) }   (TESTNET_RPC_URL from "veranta-sdk")
   //   <VerantaProvider network="testnet">
 });

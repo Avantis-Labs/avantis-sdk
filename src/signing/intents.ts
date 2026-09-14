@@ -64,7 +64,7 @@ export function intentDigest(payload: IntentPayload): Hex {
 /**
  * Verify the API digest against the locally computed one.
  *
- * @throws DigestMismatchError when they differ — never submit after this.
+ * @throws DigestMismatchError when they differ, never submit after this.
  */
 export function assertIntentDigest(payload: IntentPayload): Hex {
   const local = intentDigest(payload);

@@ -147,7 +147,7 @@ export class MarketsApi {
   /**
    * Latest executable spot for a pair (Lazer/pro, else Hermes/core).
    *
-   * Reads feed-v3 `/v2/pairs/{index}/price-update-data` — the same signed
+   * Reads feed-v3 `/v2/pairs/{index}/price-update-data`, the same signed
    * update the keeper posts on-chain. Do NOT use
    * `GET /v1/price-feeds/last-price` as a trade reference: that endpoint
    * returns a stale candle, so signing it as `wantedPrice` trips on-chain

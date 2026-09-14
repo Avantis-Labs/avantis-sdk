@@ -2,7 +2,7 @@
  * USDC approvals from the browser.
  *
  * Strategies (mirrors the Veranta delegate UI):
- * - "permit": gasless — the trader wallet signs an EIP-2612 Permit, a
+ * - "permit": gasless, the trader wallet signs an EIP-2612 Permit, a
  *   throwaway EIP-7702 account relays `USDC.permit(...)` through blitz.
  *   Works for EOAs (no ETH needed).
  * - "wallet": a normal `USDC.approve` transaction sent by the wallet

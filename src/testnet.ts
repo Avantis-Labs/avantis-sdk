@@ -4,7 +4,7 @@
  * The Veranta testnet is a fork of Base mainnet: same chainId (8453) and
  * contract addresses, its own RPC/explorer. Its rpc-proxy exposes a
  * dev-only faucet method (`dev_impersonateTransaction`) that executes
- * unsigned transactions as devnet whale wallets — so anyone can fund a
+ * unsigned transactions as devnet whale wallets, so anyone can fund a
  * fresh wallet and start trading in seconds:
  *
  *     import { Veranta, fundTestnetWallet } from "veranta-sdk";

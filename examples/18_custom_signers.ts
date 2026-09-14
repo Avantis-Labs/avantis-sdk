@@ -3,7 +3,7 @@
  *
  * - 0x private key (simplest)
  * - viem LocalAccount (mnemonic, hardware, KMS adapters)
- * - viem WalletClient (browser wallets — see veranta-sdk/react)
+ * - viem WalletClient (browser wallets, see veranta-sdk/react)
  * - your own VerantaSigner implementation (HSM, remote signer, ...)
  */
 
@@ -11,12 +11,12 @@ import { Veranta, type VerantaSigner } from "veranta-sdk";
 import { mnemonicToAccount } from "viem/accounts";
 
 // viem account (for AWS KMS use `kmsAccount` / `KmsSigner` from
-// "veranta-sdk/kms" — see examples/22_kms_signer.ts):
+// "veranta-sdk/kms", see examples/22_kms_signer.ts):
 const account = mnemonicToAccount("test test test test test test test test test test test junk");
 const client = new Veranta({ signer: account, network: "testnet" });
 console.log("signer:", client.signer!.address);
 
-// Or fully custom — implement the 4-method interface:
+// Or fully custom, implement the 4-method interface:
 const custom: VerantaSigner = {
   address: account.address,
   canSignAuthorization: true,

@@ -1,17 +1,17 @@
 # veranta-sdk
 
-Official TypeScript SDK for [Veranta](https://veranta.xyz) v2 — perpetuals
+Official TypeScript SDK for [Veranta](https://veranta.xyz) v2, perpetuals
 on Base. viem-based and API-first: no ABIs, no ethers; the SDK fetches
 payloads from the Veranta tx-builder, signs locally (with a digest
-correctness gate), and executes gaslessly through the Veranta relayer — or
+correctness gate), and executes gaslessly through the Veranta relayer, or
 through your own RPC/wallet.
 
 One package, three entry points:
 
 | import | for |
 |---|---|
-| `veranta-sdk` | Node backends, bots, edge — the full trading client |
-| `veranta-sdk/react` | React apps — wagmi + TanStack Query hooks, session keys, live prices |
+| `veranta-sdk` | Node backends, bots, edge, the full trading client |
+| `veranta-sdk/react` | React apps, wagmi + TanStack Query hooks, session keys, live prices |
 | `veranta-sdk/kms` | Node backends signing with an AWS KMS key (`KmsSigner`); the key never leaves KMS |
 
 Full feature parity with the Python [`veranta-sdk`](https://github.com/Avantis-Labs/avantis_trader_sdk):
@@ -52,7 +52,7 @@ Gasless by default: no RPC, no ETH. Get an API (delegate) key at
 ## Try it on testnet in 60 seconds
 
 The Veranta testnet is a fork of Base (same chainId 8453, same contracts)
-with a built-in dev faucet — no keys to source, no faucet sites:
+with a built-in dev faucet, no keys to source, no faucet sites:
 
 ```ts
 import { Veranta, fundTestnetWallet } from "veranta-sdk";
@@ -70,7 +70,7 @@ Or just run the script: `pnpm tsx examples/00_testnet_quickstart.ts`.
 `network: "testnet"` rebinds every service URL to the staging stack and
 defaults `rpcUrl` to the fork RPC; for browser apps point your wagmi
 transport at `TESTNET_RPC_URL` (imported from `veranta-sdk`) so on-chain
-reads hit the fork too. The faucet only exists on the fork — mainnet is
+reads hit the fork too. The faucet only exists on the fork, mainnet is
 never touched.
 
 ## React quickstart
@@ -109,24 +109,24 @@ forces the fallback.
 
 ## The pieces
 
-- **Namespaces** — `client.trade`, `client.account`, `client.markets`,
+- **Namespaces**: `client.trade`, `client.account`, `client.markets`,
   `client.info`, `client.referral`, `client.lp`; pure math in the `compute`
-  export (PnL, liquidation, validation — UI parity).
-- **Signers** — a `0x` private key, any viem `LocalAccount`, a browser
+  export (PnL, liquidation, validation, UI parity).
+- **Signers**: a `0x` private key, any viem `LocalAccount`, a browser
   `WalletClient`, an AWS KMS key via `KmsSigner` / `kmsAccount` from
   `veranta-sdk/kms` (the Python `KmsSigner` twin; see
   `examples/22_kms_signer.ts`), or your own `VerantaSigner` (HSM, remote
   signer).
-- **Execution** — signed EIP-712 intents to the batched-market API with a
+- **Execution**: signed EIP-712 intents to the batched-market API with a
   streamed order lifecycle; gasless EIP-7702 (Gelato) relays for everything
   else; automatic wallet-transaction fallback for browser wallets; `direct`
   mode for your own RPC.
-- **Session keys (1CT)** — `useSessionKey()` registers a local delegate key
+- **Session keys (1CT)**: `useSessionKey()` registers a local delegate key
   (one wallet signature) so orders sign silently afterwards. Keys can only
   trade; they cannot move funds; revoke anytime.
-- **Market-maker fast path** — `client.localIntents()` builds intents with
+- **Market-maker fast path**: `client.localIntents()` builds intents with
   zero HTTP on the hot path; see `examples/13_mm_fast_path.ts`.
-- **Correctness** — every intent is digest-asserted before signing; the
+- **Correctness**: every intent is digest-asserted before signing; the
   golden-vector suite proves all 17 intent kinds against the on-chain
   hashing library, and the EIP-7702 encoder is byte-identical to
   `@gelatocloud/gasless`.
@@ -203,7 +203,7 @@ Full owner + trader + app walkthrough: `examples/20_builder_code.ts`.
 
 Runnable scripts `00`-`22` in [`examples/`](./examples) mirroring the Python
 SDK's set (22 = AWS KMS backend signer), plus the Next.js trading panel. Agents: read [`AGENTS.md`](./AGENTS.md)
-first — it carries the invariants and routing rules.
+first, it carries the invariants and routing rules.
 
 ## Development
 

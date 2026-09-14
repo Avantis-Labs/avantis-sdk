@@ -6,7 +6,7 @@
  * EIP-712 `DelegateReq` (with the ToS text), relays `setDelegateWithSig`
  * gaslessly through blitz (the session key signs the EIP-7702 leg), then
  * polls until the delegation is active. From then on the provider signs
- * every intent with the session key — no wallet popups per order.
+ * every intent with the session key, no wallet popups per order.
  *
  * The key lives in localStorage, scoped to (network, trader). It can only
  * trade on the trader's behalf; it cannot withdraw or transfer funds.

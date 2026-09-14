@@ -3,7 +3,7 @@
  * persisted in localStorage like the Veranta UI's one-click-trading store.
  *
  * The key never leaves the browser; it is registered on-chain as a trading
- * delegate (`setDelegateWithSig`) and can only trade — it cannot withdraw
+ * delegate (`setDelegateWithSig`) and can only trade, it cannot withdraw
  * or transfer funds, and the trader can revoke it at any time.
  */
 
@@ -51,7 +51,7 @@ export function readSessionKey(network: string, trader: Address): SessionKeyReco
   }
 }
 
-/** Raw record incl. pending (unregistered) keys — for the enable flow. */
+/** Raw record incl. pending (unregistered) keys, for the enable flow. */
 export function readSessionKeyRaw(network: string, trader: Address): SessionKeyRecord | null {
   const raw = storage()?.getItem(storageKey(network, trader));
   if (!raw) return null;

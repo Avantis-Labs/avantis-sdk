@@ -19,7 +19,7 @@ import { toSigner } from "../src/signing/signer.js";
 import type { IntentPayload } from "../src/types.js";
 import VECTORS from "./vectors/vectors.json";
 
-// well-known anvil test key — test-only
+// well-known anvil test key, test-only
 const TEST_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80" as const;
 const TEST_ADDRESS = privateKeyToAccount(TEST_KEY).address;
 

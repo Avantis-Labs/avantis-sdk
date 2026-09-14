@@ -1,18 +1,18 @@
-# Veranta TypeScript SDK (`veranta-sdk`) — Agent Rules
+# Veranta TypeScript SDK (`veranta-sdk`): Agent Rules
 
 ## About This SDK
-Official TypeScript SDK for Veranta v2 — perpetuals on Base (8453).
+Official TypeScript SDK for Veranta v2, perpetuals on Base (8453).
 viem-based, API-first (HyperLiquid-style): NO ABIs, NO ethers. Payloads come
 from the tx-builder API; the SDK signs locally and submits via the Veranta
 relayer (default, gasless) or the user's own RPC / wallet. Feature parity
-with the Python `veranta-sdk`; examples/ mirror its 00–21 set, plus 22
+with the Python `veranta-sdk`; examples/ mirror its 00-21 set, plus 22
 (AWS KMS backend signer, the twin of the Python KmsSigner example).
 
 Three entry points, one install:
 - `veranta-sdk`        isomorphic core (Node >= 20, browsers, edge)
 - `veranta-sdk/react`  wagmi v2 + TanStack Query v5 hooks
 - `veranta-sdk/kms`    AWS KMS signer (Node only; optional peer
-                       @aws-sdk/client-kms) — the Python KmsSigner twin
+                       @aws-sdk/client-kms), the Python KmsSigner twin
 
 ## Core Patterns
 
@@ -35,12 +35,12 @@ open.mutate({ pair: "ETH/USD", side: "long", collateral: 100, leverage: 10 });
 trader signs one DelegateReq, everything after signs silently.
 
 ### Namespaces (same surface as the Python SDK)
-- client.trade    — opens/closes/limits/margin/increase/tpsl/twap/rfq
-- client.account  — positions, allowance, delegation, approvals, claims, builder codes
-- client.markets  — pair catalog, prices, dynamic spread, candles
-- client.info     — history, portfolio, referral stats, vault APY
-- client.referral / client.lp — actions (caller-scoped; trader key only)
-- compute (export) — pure UI-parity math (PnL, liq, validation)
+- client.trade: opens/closes/limits/margin/increase/tpsl/twap/rfq
+- client.account: positions, allowance, delegation, approvals, claims, builder codes
+- client.markets: pair catalog, prices, dynamic spread, candles
+- client.info: history, portfolio, referral stats, vault APY
+- client.referral / client.lp: actions (caller-scoped; trader key only)
+- compute (export): pure UI-parity math (PnL, liq, validation)
 
 ### Signers (`toSigner` accepts any of)
 - 0x private key (backend, session keys)
@@ -85,12 +85,12 @@ Service URLs derive from apiBaseUrl (prod-api/staging-api.veranta.xyz):
 ## Critical Invariants (do not break)
 
 1. Every signed intent MUST pass the digest assert (src/signing/intents.ts).
-   Golden vectors in tests/vectors/vectors.json prove all 17 intent kinds —
+   Golden vectors in tests/vectors/vectors.json prove all 17 intent kinds,
    tests/goldenVectors.test.ts and tests/localIntents.test.ts must stay
    green. The vectors are shared verbatim with the Python SDK.
 2. EIP-7702 encoding (src/eip7702/account.ts) is byte-for-byte compatible
-   with @gelatocloud/gasless — tests/eip7702.test.ts guards this.
-3. src/signing/schema.ts mirrors contracts SignatureHelpers.sol verbatim —
+   with @gelatocloud/gasless, tests/eip7702.test.ts guards this.
+3. src/signing/schema.ts mirrors contracts SignatureHelpers.sol verbatim,
    never "normalize" field names (`_t`, `_deadline` vs `trader`, `nonce`).
 4. deadline/deadlineMs = MILLISECONDS; delegate expiry = SECONDS
    (EIP-2612 permit deadline = SECONDS).
@@ -120,7 +120,7 @@ RPC). `fundTestnetWallet(address)` faucet-funds any wallet via the fork's
 `dev_impersonateTransaction` (fork-only; refuses non-testnet RPCs). The
 zero-setup path is examples/00_testnet_quickstart.ts; the live round-trip
 suite is `pnpm test:e2e` (tests/e2e/testnet.e2e.test.ts, gated by
-VERANTA_E2E=1 — it covers blitz 7702 approve, batched-market SSE
+VERANTA_E2E=1, it covers blitz 7702 approve, batched-market SSE
 open/close, and price-triggers TP against staging).
 
 ## Live prices in UIs

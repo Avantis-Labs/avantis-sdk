@@ -136,7 +136,7 @@ export class TradeApi extends ExecutingApi {
    * delegation template, which needs an EIP-7702 authorization signed by
    * the SDK's signer. A browser wallet (JSON-RPC account) cannot sign one:
    * `submitPassthrough` would fall back to a plain wallet transaction that
-   * places the order and charges NO fee. Refuse up front instead — the
+   * places the order and charges NO fee. Refuse up front instead, the
    * same reasoning as the direct-mode refusal in `submitMarket`.
    */
   private requireBuilderCapableSigner(): void {
@@ -156,7 +156,7 @@ export class TradeApi extends ExecutingApi {
    *
    * Builder-fee orders must execute their EIP-7702 leg (the fee suffix
    * lives in the calldata; the signed intent carries no builder params), so
-   * they relay straight through blitz — which also means they need a signer
+   * they relay straight through blitz, which also means they need a signer
    * that can sign EIP-7702 authorizations (requireBuilderCapableSigner).
    * Everything else keeps the batched-market path with its server-side
    * mechanism switch and SSE lifecycle. Direct mode sends a plain type-2 to

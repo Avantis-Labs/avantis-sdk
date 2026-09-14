@@ -2,7 +2,7 @@
  * ZERO-SETUP testnet quickstart: no faucet hunting, no keys to source.
  *
  * Generates a wallet, funds it from the testnet fork's dev faucet, and
- * trades — all in one script:
+ * trades, all in one script:
  *
  *     pnpm tsx examples/00_testnet_quickstart.ts
  *
@@ -12,7 +12,7 @@
 import { Veranta, TESTNET_EXPLORER_URL, fundTestnetWallet } from "veranta-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
-// 1. A wallet. Fresh one by default — SAVE THE KEY if you want to keep it.
+// 1. A wallet. Fresh one by default, SAVE THE KEY if you want to keep it.
 const privateKey =
   (process.env.VERANTA_PRIVATE_KEY as `0x${string}` | undefined) ?? generatePrivateKey();
 const wallet = privateKeyToAccount(privateKey);

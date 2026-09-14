@@ -3,7 +3,7 @@
  *
  * The trader key signs ONE DelegateReq intent (with the ToS text); the
  * fresh delegate key relays setDelegateWithSig gaslessly. Afterwards the
- * delegate key trades on the trader's behalf — the trader key is never
+ * delegate key trades on the trader's behalf, the trader key is never
  * needed again (until revoke).
  *
  * Env: TRADER_PRIVATE_KEY (used transiently for the one signature).
@@ -16,7 +16,7 @@ const traderKey = process.env.TRADER_PRIVATE_KEY as `0x${string}`;
 if (!traderKey) throw new Error("set TRADER_PRIVATE_KEY");
 const trader = privateKeyToAccount(traderKey);
 
-// 1. Fresh delegate key (this is your API key — store it safely).
+// 1. Fresh delegate key (this is your API key, store it safely).
 const delegateKey = generatePrivateKey();
 const delegate = privateKeyToAccount(delegateKey);
 console.log("delegate address:", delegate.address);

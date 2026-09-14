@@ -157,7 +157,7 @@ export interface IntentPayload {
   types: Record<string, Eip712Field[]>;
   message: Record<string, any>;
   digest: Hex;
-  /** abi.encode of the struct — becomes `userIntent` for operator entry points. */
+  /** abi.encode of the struct, becomes `userIntent` for operator entry points. */
   encodedIntent: Hex;
   meta?: Record<string, unknown>;
   [key: string]: unknown;

@@ -2,13 +2,13 @@
  * End-to-end test against the Veranta TESTNET (internal Base fork).
  *
  * Fully self-contained: generates a fresh wallet, funds it through the
- * fork's dev faucet, then exercises every transport the SDK has —
+ * fork's dev faucet, then exercises every transport the SDK has,
  * tx-builder builds, blitz type-4 relay (USDC approve), batched-market SSE
  * (open + close with lifecycle events), core price-triggers (global TP),
  * and the read APIs.
  *
  * Gated: only runs with VERANTA_E2E=1 (pnpm test:e2e). Never touches
- * mainnet — network is hard-pinned to "testnet".
+ * mainnet, network is hard-pinned to "testnet".
  */
 
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";

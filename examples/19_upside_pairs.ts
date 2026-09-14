@@ -1,7 +1,7 @@
 /**
  * Upside markets (formerly ZFP/zero-fee): separate pairs suffixed _UPSIDE.
  *
- * No flag to pass — trade "BTC_UPSIDE" and the SDK sends the PnL order
+ * No flag to pass, trade "BTC_UPSIDE" and the SDK sends the PnL order
  * type automatically. Upside pairs are market-only (no limits, no TWAP)
  * and pay a tiered profit share instead of fixed fees.
  */

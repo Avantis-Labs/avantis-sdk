@@ -267,7 +267,7 @@ export class ExecutionEngine {
    *
    * When the signer cannot sign EIP-7702 authorizations (browser wallets),
    * falls back to sending the calldata as a normal transaction through the
-   * wallet (route `wallet`) — same on-chain effect, gas paid by the user.
+   * wallet (route `wallet`), same on-chain effect, gas paid by the user.
    */
   async submitPassthrough(
     calldata: CallData,

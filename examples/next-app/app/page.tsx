@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Minimal end-to-end trading panel — the canonical template to copy:
+ * Minimal end-to-end trading panel, the canonical template to copy:
  * connect wallet -> enable one-click trading -> approve USDC -> live price
  * -> open/close positions with lifecycle toasts.
  */
@@ -80,7 +80,7 @@ export default function Page() {
 
   return (
     <main style={{ maxWidth: 640, margin: "40px auto", padding: 16 }}>
-      <h1 style={{ fontSize: 22 }}>Veranta SDK — trading panel</h1>
+      <h1 style={{ fontSize: 22 }}>Veranta SDK, trading panel</h1>
 
       <section style={card}>
         {isConnected ? (

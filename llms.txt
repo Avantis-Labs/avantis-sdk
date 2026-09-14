@@ -9,9 +9,9 @@
 
 ## Start here
 
-- AGENTS.md: invariants, execution routing, signing rules — read first.
+- AGENTS.md: invariants, execution routing, signing rules, read first.
 - README.md: install + backend/React quickstarts.
-- examples/: runnable scripts 00–22 (22 = AWS KMS backend signer) +
+- examples/: runnable scripts 00-22 (22 = AWS KMS backend signer) +
   examples/next-app trading panel.
 
 ## Key facts
@@ -31,7 +31,7 @@
   Error payloads carry a machine `code` (e.g. WrongSl, NO_PRICE).
 - TP/SL: `trade.updateTpSl` (global, on-chain; 0 clears/resets),
   `trade.partialTpSl` CRUD (off-chain triggers with entityId).
-- Session keys: react `useSessionKey()` or `account.registerDelegate` —
+- Session keys: react `useSessionKey()` or `account.registerDelegate`,
   delegate keys trade only, never move funds.
 - Builder codes: `new Veranta({ builderCode, builderFeePercent })` (or
   VERANTA_BUILDER_CODE / VERANTA_BUILDER_FEE_PERCENT) attaches a per-order

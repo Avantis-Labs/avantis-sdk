@@ -91,7 +91,7 @@ export class HttpTransport {
 
   /**
    * Streaming request (SSE). Returns the raw Response; the caller reads
-   * `response.body`. No overall timeout is applied — the batched-market
+   * `response.body`. No overall timeout is applied, the batched-market
    * stream heartbeats every 15s and the SSE consumer enforces idle gaps.
    */
   async stream(

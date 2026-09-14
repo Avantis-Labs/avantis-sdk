@@ -1,6 +1,6 @@
 {
   "name": "veranta-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Official TypeScript SDK for Veranta v2 - perpetuals on Base. viem-based, API-first (no ABIs), gasless via the Veranta relayer, with React hooks at veranta-sdk/react and an AWS KMS signer at veranta-sdk/kms.",
   "license": "MIT",
   "type": "module",
