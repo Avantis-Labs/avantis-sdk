@@ -1,15 +1,15 @@
 /** Open positions with live net-PnL math (compute module = UI parity). */
 
 import {
-  Avantis,
+  Veranta,
   compute,
   positionCollateral,
   positionLeverage,
   positionOpenPrice,
   positionSide,
-} from "avantis-sdk";
+} from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const data = await client.account.positions();
 console.log(`positions: ${data.positions.length}, limit orders: ${data.limitOrders.length}`);

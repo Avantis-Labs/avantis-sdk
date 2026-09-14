@@ -1,7 +1,7 @@
 /** Shared base for namespaces that execute transactions. */
 
 import type { Address } from "viem";
-import type { AvantisConfig } from "../config.js";
+import type { VerantaConfig } from "../config.js";
 import { ConfigError } from "../errors.js";
 import type { ExecutionEngine } from "../execution/engine.js";
 import type { HttpTransport } from "../transport.js";
@@ -10,7 +10,7 @@ import type { CallData, ExecutionReceipt } from "../types.js";
 
 export class ExecutingApi {
   constructor(
-    protected readonly cfg: AvantisConfig,
+    protected readonly cfg: VerantaConfig,
     protected readonly engine: ExecutionEngine,
     protected readonly txb: TxBuilderClient,
     protected readonly transport: HttpTransport,
@@ -20,7 +20,7 @@ export class ExecutingApi {
   get trader(): Address {
     if (this.cfg.trader) return this.cfg.trader;
     if (this.engine.signer) return this.engine.signer.address;
-    throw new ConfigError("No trader address: set `trader` / AVANTIS_TRADER_ADDRESS or a signer.");
+    throw new ConfigError("No trader address: set `trader` / VERANTA_TRADER_ADDRESS or a signer.");
   }
 
   /** Delegate address for calldata wrapping, when signer != trader. */
@@ -75,7 +75,7 @@ export class ExecutingApi {
     if (this.delegateParam !== undefined) {
       throw new ConfigError(
         `${what} executes as the caller's own address and cannot be routed through ` +
-          "a delegate key. Run it with the trader key (or on the Avantis UI).",
+          "a delegate key. Run it with the trader key (or on the Veranta UI).",
       );
     }
   }

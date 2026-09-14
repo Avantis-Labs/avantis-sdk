@@ -1,5 +1,5 @@
 /**
- * History / portfolio / referral / vault analytics (avantis-server API).
+ * History / portfolio / referral / vault analytics (veranta-server API).
  *
  * All endpoints degrade gracefully: a missing endpoint on a given
  * deployment throws ApiError with status 404 rather than crashing the
@@ -7,12 +7,12 @@
  */
 
 import type { Address } from "viem";
-import type { AvantisConfig } from "../config.js";
+import type { VerantaConfig } from "../config.js";
 import type { HttpTransport } from "../transport.js";
 
 export class InfoApi {
   constructor(
-    private readonly cfg: AvantisConfig,
+    private readonly cfg: VerantaConfig,
     private readonly transport: HttpTransport,
   ) {}
 

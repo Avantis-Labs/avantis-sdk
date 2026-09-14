@@ -1,9 +1,9 @@
 /** History + portfolio analytics (info namespace, human units). */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
-const trader = (process.env.AVANTIS_TRADER_ADDRESS ?? client.signer?.address) as `0x${string}`;
+const client = new Veranta();
+const trader = (process.env.VERANTA_TRADER_ADDRESS ?? client.signer?.address) as `0x${string}`;
 
 const trades = await client.info.tradeHistory(trader, 0, 5);
 console.log("recent fills:", JSON.stringify(trades).slice(0, 300));

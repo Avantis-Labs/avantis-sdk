@@ -2,14 +2,14 @@
  * Direct mode: sign EIP-1559 transactions yourself and broadcast via your
  * own RPC (no relayer). You pay gas in ETH.
  *
- * Env: AVANTIS_PRIVATE_KEY (trader key), AVANTIS_RPC_URL (any Base RPC).
+ * Env: VERANTA_PRIVATE_KEY (trader key), VERANTA_RPC_URL (any Base RPC).
  */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis({
+const client = new Veranta({
   execution: "direct",
-  rpcUrl: process.env.AVANTIS_RPC_URL ?? "https://mainnet.base.org",
+  rpcUrl: process.env.VERANTA_RPC_URL ?? "https://mainnet.base.org",
 });
 
 // Approvals and trades all become normal transactions from your EOA:

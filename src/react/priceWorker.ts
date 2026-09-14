@@ -1,7 +1,7 @@
 /**
  * Web-Worker leg of the live price feed.
  *
- * The production Avantis UI runs its Lazer SSE stream inside a dedicated
+ * The production Veranta UI runs its Lazer SSE stream inside a dedicated
  * worker so high-frequency tick parsing (JSON + fan-out for many pairs)
  * never blocks the main thread during renders. The SDK ships the same
  * pattern with zero bundler configuration: the worker is spawned from an
@@ -67,7 +67,7 @@ export function createPriceWorker(onMessage: (message: PriceWorkerMessage) => vo
   try {
     const blob = new Blob([WORKER_SOURCE], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
-    const worker = new Worker(url, { name: "avantis-price-feed" });
+    const worker = new Worker(url, { name: "veranta-price-feed" });
     URL.revokeObjectURL(url); // the worker keeps its own reference
     worker.onmessage = (event: MessageEvent<PriceWorkerMessage>) => onMessage(event.data);
     return worker;

@@ -1,11 +1,11 @@
-# avantis-sdk
+# veranta-sdk
 
 ## 0.1.0
 
 Initial release: full-parity TypeScript port of the Python
-avantis-trader-sdk.
+veranta-sdk.
 
-- Isomorphic core (`avantis-sdk`): trade / account / markets / info /
+- Isomorphic core (`veranta-sdk`): trade / account / markets / info /
   referral / lp namespaces, compute math, price + order streams, local
   intent builder (MM fast path).
 - Signing: EIP-712 intents with a mandatory digest assert; 17 intent kinds
@@ -14,7 +14,7 @@ avantis-trader-sdk.
 - Execution: batched-market SSE with tracking-id replay, blitz relayer,
   core price-triggers, twap-app, direct RPC, capability-aware wallet
   fallback for browser signers.
-- React (`avantis-sdk/react`): AvantisProvider, live price hook (shared
+- React (`veranta-sdk/react`): VerantaProvider, live price hook (shared
   Lazer SSE running in a Web Worker by default, main-thread fallback),
   positions/history/allowance queries, trading mutations with lifecycle
   events, `useSessionKey` one-click trading, permit-gasless USDC

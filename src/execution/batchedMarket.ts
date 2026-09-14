@@ -29,7 +29,7 @@
  * is persisted with its seq, so the replay is complete.
  *
  * `AttemptFailed` and `Error` payloads carry a machine-readable `code` next
- * to the human `message`: a bare Avantis contract error name (`WrongSl`,
+ * to the human `message`: a bare Veranta contract error name (`WrongSl`,
  * `HighSlippage`) when the failure decoded to a revert, or a synthetic
  * backend code (`NO_PRICE`, `SPREAD_BLOCKED`, `SPREAD_UNAVAILABLE`,
  * `SUBMISSION_FAILED`, `ATTEMPTS_EXHAUSTED`, `TX_NOT_EXECUTED`,

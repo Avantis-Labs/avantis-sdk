@@ -1,5 +1,5 @@
 /**
- * Client for the avantis-tx-builder API (`/v2/*`).
+ * Client for the veranta-tx-builder API (`/v2/*`).
  *
  * This is the SDK's payload factory: calldata for the direct route, EIP-712
  * intents for the relayer route, plus meta/reads. All build endpoints accept

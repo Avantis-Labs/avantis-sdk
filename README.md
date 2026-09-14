@@ -1,19 +1,20 @@
-# avantis-sdk
+# veranta-sdk
 
-Official TypeScript SDK for [Avantis](https://avantisfi.com) v2 — perpetuals
+Official TypeScript SDK for [Veranta](https://veranta.xyz) v2 — perpetuals
 on Base. viem-based and API-first: no ABIs, no ethers; the SDK fetches
-payloads from the Avantis tx-builder, signs locally (with a digest
-correctness gate), and executes gaslessly through the Avantis relayer — or
+payloads from the Veranta tx-builder, signs locally (with a digest
+correctness gate), and executes gaslessly through the Veranta relayer — or
 through your own RPC/wallet.
 
-One package, two entry points:
+One package, three entry points:
 
 | import | for |
 |---|---|
-| `avantis-sdk` | Node backends, bots, edge — the full trading client |
-| `avantis-sdk/react` | React apps — wagmi + TanStack Query hooks, session keys, live prices |
+| `veranta-sdk` | Node backends, bots, edge — the full trading client |
+| `veranta-sdk/react` | React apps — wagmi + TanStack Query hooks, session keys, live prices |
+| `veranta-sdk/kms` | Node backends signing with an AWS KMS key (`KmsSigner`); the key never leaves KMS |
 
-Full feature parity with the Python [`avantis-trader-sdk`](https://github.com/Avantis-Labs/avantis_trader_sdk):
+Full feature parity with the Python [`veranta-sdk`](https://github.com/Avantis-Labs/avantis_trader_sdk):
 market/limit/TWAP orders, TP/SL (global + partial), margin, positions,
 portfolio history, LP vault, referrals, builder codes, price streams, and a
 market-maker fast path.
@@ -21,18 +22,20 @@ market-maker fast path.
 ## Install
 
 ```bash
-npm i avantis-sdk viem
+npm i veranta-sdk viem
 # for React hooks:
 npm i wagmi @tanstack/react-query
+# for the AWS KMS signer (veranta-sdk/kms):
+npm i @aws-sdk/client-kms
 ```
 
 ## Backend quickstart (10 lines)
 
 ```ts
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-// env: AVANTIS_PRIVATE_KEY=0x… (API key), AVANTIS_TRADER_ADDRESS=0x… (your wallet)
-const client = new Avantis();
+// env: VERANTA_PRIVATE_KEY=0x… (API key), VERANTA_TRADER_ADDRESS=0x… (your wallet)
+const client = new Veranta();
 
 const receipt = await client.trade.marketOpen("ETH/USD", "long", {
   collateral: 100, // USDC
@@ -43,22 +46,22 @@ console.log(receipt.txHash);
 ```
 
 Gasless by default: no RPC, no ETH. Get an API (delegate) key at
-[delegate.avantisfi.com](https://delegate.avantisfi.com) or with
+[delegate.veranta.xyz](https://delegate.veranta.xyz) or with
 `examples/11_delegate_onboarding.ts`.
 
 ## Try it on testnet in 60 seconds
 
-The Avantis testnet is a fork of Base (same chainId 8453, same contracts)
+The Veranta testnet is a fork of Base (same chainId 8453, same contracts)
 with a built-in dev faucet — no keys to source, no faucet sites:
 
 ```ts
-import { Avantis, fundTestnetWallet } from "avantis-sdk";
+import { Veranta, fundTestnetWallet } from "veranta-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 const key = generatePrivateKey();
 await fundTestnetWallet(privateKeyToAccount(key).address); // 0.05 ETH + 1,000 USDC
 
-const client = new Avantis({ network: "testnet", signer: key });
+const client = new Veranta({ network: "testnet", signer: key });
 await client.account.approveUsdc(); // gasless
 await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 5 });
 ```
@@ -66,17 +69,17 @@ await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 5 
 Or just run the script: `pnpm tsx examples/00_testnet_quickstart.ts`.
 `network: "testnet"` rebinds every service URL to the staging stack and
 defaults `rpcUrl` to the fork RPC; for browser apps point your wagmi
-transport at `TESTNET_RPC_URL` (imported from `avantis-sdk`) so on-chain
+transport at `TESTNET_RPC_URL` (imported from `veranta-sdk`) so on-chain
 reads hit the fork too. The faucet only exists on the fork — mainnet is
 never touched.
 
 ## React quickstart
 
 ```tsx
-import { AvantisProvider, useMarketOpen, usePrice, usePositions, useSessionKey } from "avantis-sdk/react";
+import { VerantaProvider, useMarketOpen, usePrice, usePositions, useSessionKey } from "veranta-sdk/react";
 
 // inside <WagmiProvider> + <QueryClientProvider>:
-<AvantisProvider network="mainnet">{children}</AvantisProvider>;
+<VerantaProvider network="mainnet">{children}</VerantaProvider>;
 
 function Trade() {
   const price = usePrice("ETH/USD");            // live via SSE
@@ -97,7 +100,7 @@ Privy, Reown AppKit, plain injected). A complete trading panel lives in
 [`examples/next-app`](./examples/next-app).
 
 `usePrice` streams over one shared SSE connection that runs **inside a Web
-Worker by default** (same pattern as the production Avantis UI): tick
+Worker by default** (same pattern as the production Veranta UI): tick
 parsing and fan-out stay off the main thread, so charts and forms keep
 rendering smoothly under heavy price traffic. No bundler config needed (the
 worker spawns from an inline Blob); it falls back to a main-thread stream
@@ -110,7 +113,10 @@ forces the fallback.
   `client.info`, `client.referral`, `client.lp`; pure math in the `compute`
   export (PnL, liquidation, validation — UI parity).
 - **Signers** — a `0x` private key, any viem `LocalAccount`, a browser
-  `WalletClient`, or your own `AvantisSigner` (KMS/HSM).
+  `WalletClient`, an AWS KMS key via `KmsSigner` / `kmsAccount` from
+  `veranta-sdk/kms` (the Python `KmsSigner` twin; see
+  `examples/22_kms_signer.ts`), or your own `VerantaSigner` (HSM, remote
+  signer).
 - **Execution** — signed EIP-712 intents to the batched-market API with a
   streamed order lifecycle; gasless EIP-7702 (Gelato) relays for everything
   else; automatic wallet-transaction fallback for browser wallets; `direct`
@@ -128,26 +134,75 @@ forces the fallback.
 ## Configuration
 
 Constructor options > env vars > network profile (`mainnet` default,
-`testnet` staging stack). Env: `AVANTIS_PRIVATE_KEY`,
-`AVANTIS_TRADER_ADDRESS`, `AVANTIS_NETWORK`, `AVANTIS_EXECUTION`,
-`AVANTIS_RPC_URL`, `AVANTIS_BUILDER_CODE`, `AVANTIS_BUILDER_FEE_PERCENT`,
-plus per-service URL overrides. See `src/config.ts`.
+`testnet` staging stack). Env: `VERANTA_PRIVATE_KEY`,
+`VERANTA_TRADER_ADDRESS`, `VERANTA_NETWORK`, `VERANTA_EXECUTION`,
+`VERANTA_RPC_URL`, `VERANTA_BUILDER_CODE`, `VERANTA_BUILDER_FEE_PERCENT`,
+plus per-service URL overrides. Pre-rename `AVANTIS_*` names are still read
+when the `VERANTA_*` one is unset (with a console warning). See `src/config.ts`.
 
 ## Builder codes
 
-Attribute order flow and earn per-order fees:
+A builder code attributes order flow to your integration and charges a
+**per-order fee**: a percent of the order's notional (collateral x
+leverage) that you choose per order, up to the three public caps your code
+registers (open/increase, close, PnL-pair close). Fees are pulled from the
+trader's USDC allowance **to the BuilderCode registry** and paid to your fee
+collector. Never through your own wallet, never through the user's delegate
+key.
 
 ```ts
-const client = new Avantis({ builderCode: "MYAPP", builderFeePercent: 0.05 });
+// 1. Owner, once (trader wallet, caller-scoped): register the code + caps.
+await owner.account.registerBuilderCode("MYAPP", {
+  feeCollector: "0x...",
+  maxOpenFeePercent: 0.1, // % of notional per open / increase
+  maxCloseFeePercent: 0.05,
+  maxPnlCloseFeePercent: 0.05,
+});
+
+// 2. Each trader, once (trader wallet): the SECOND USDC approval.
+await trader.account.approveUsdc(); // collateral -> TradingStorage
+await trader.account.approveBuilderFees(); // fees -> BuilderCode registry
+
+// 3. Your app (delegate / session key): attach the code + a default rate.
+const client = new Veranta({ builderCode: "MYAPP", builderFeePercent: 0.05 });
+await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 10 });
+// 1,000 notional -> 0.5 USDC to your collector at 0.05%; per-order override:
+await client.trade.marketClose("ETH/USD", 0, { collateralToClose: 100, builderFeePercent: 0.02 });
 ```
 
-Register a code and set caps with `client.account.registerBuilderCode` —
-see `examples/20_builder_code.ts`.
+How builder orders route:
+
+- Fee-eligible actions are market opens, closes and increases (plus the
+  coin-sized variants). Limit/stop placements, TWAP, RFQ, TP/SL and margin
+  never charge, and `limitOpen` takes no builder parameter.
+- Builder orders relay through the blitz passthrough (receipt route
+  `relayer-passthrough`) so the fee-charging EIP-7702 template always
+  executes. They settle normally but have **no SSE lifecycle**: `onEvent`
+  does not fire; confirm fills with `account.positions()`.
+- The EIP-7702 authorization targets the canonical template served by
+  `/v2/meta` (`addresses.delegationTemplate`); an explicit
+  `delegationAddress` still wins. Registry and template addresses are never
+  hard-coded in the SDK.
+- Builder fees need a signer that can sign EIP-7702 authorizations (a
+  private key or a session key). Direct mode and browser wallets without a
+  session key are **refused** with a `ConfigError` instead of silently
+  placing a fee-less order.
+- Upside (PnL) pairs never pay open/increase fees: the SDK sends an explicit
+  zero rate there; closes keep your rate under the PnL-close cap.
+- Lookup: `client.account.builderCode("MYAPP")` returns `registered`,
+  `owner`, `feeCollector`, the three `max*FeePercent` caps and the
+  governance `globalCapPercent`. Trader-side: `account.builderFeeAllowance()`
+  (allowances decrement as fees are charged).
+- React: `useRegisterBuilderCode`, `useModifyBuilderCode`,
+  `useBuilderCodeInfo`, `useApproveBuilderFees`, `useBuilderFeeAllowance`;
+  the trading mutations accept `builderFeePercent`.
+
+Full owner + trader + app walkthrough: `examples/20_builder_code.ts`.
 
 ## Examples
 
-21 runnable scripts in [`examples/`](./examples) mirroring the Python SDK's
-set, plus the Next.js trading panel. Agents: read [`AGENTS.md`](./AGENTS.md)
+Runnable scripts `00`-`22` in [`examples/`](./examples) mirroring the Python
+SDK's set (22 = AWS KMS backend signer), plus the Next.js trading panel. Agents: read [`AGENTS.md`](./AGENTS.md)
 first — it carries the invariants and routing rules.
 
 ## Development

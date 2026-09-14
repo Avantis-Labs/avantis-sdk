@@ -1,8 +1,8 @@
 /** Real-time streams: Lazer SSE prices + Pusher order events. */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 // Lazer feed ids come from the pair snapshot:
 const eth = await client.markets.pair("ETH/USD");

@@ -1,5 +1,5 @@
 /**
- * Typed error taxonomy for the Avantis SDK.
+ * Typed error taxonomy for the Veranta SDK.
  *
  * Every failure surface (tx-builder envelope errors, relayer failures, RPC
  * errors, signing mismatches, local validation) maps to one of these classes
@@ -7,12 +7,12 @@
  */
 
 /** Base class for all SDK errors. */
-export class AvantisError extends Error {
-  override name = "AvantisError";
+export class VerantaError extends Error {
+  override name = "VerantaError";
 }
 
 /** Invalid or incomplete SDK configuration. */
-export class ConfigError extends AvantisError {
+export class ConfigError extends VerantaError {
   override name = "ConfigError";
 }
 
@@ -24,12 +24,12 @@ export interface ApiErrorOptions {
 }
 
 /**
- * An Avantis HTTP API returned an error envelope or bad status.
+ * An Veranta HTTP API returned an error envelope or bad status.
  *
  * Fields mirror the tx-builder error envelope:
  * `{ ok: false, error: { code, message, details } }`.
  */
-export class ApiError extends AvantisError {
+export class ApiError extends VerantaError {
   override name = "ApiError";
   readonly code: string;
   readonly status?: number;
@@ -71,7 +71,7 @@ export class UpstreamError extends ApiError {
 }
 
 /** Local signing failure. */
-export class SigningError extends AvantisError {
+export class SigningError extends VerantaError {
   override name = "SigningError";
 }
 
@@ -89,13 +89,13 @@ export class DigestMismatchError extends SigningError {
  * Operator relayer rejected or failed a queued request.
  *
  * `code` is the machine-readable failure code when the batched-market stream
- * terminated with an `Error` event: a bare Avantis contract error name
+ * terminated with an `Error` event: a bare Veranta contract error name
  * (`WrongSl`, `HighSlippage`, ...) when execution decoded to a specific
  * revert, or a synthetic backend code (`NO_PRICE`, `SPREAD_UNAVAILABLE`,
  * `ATTEMPTS_EXHAUSTED`, `ENQUEUE_FAILED`, ...). Branch on it instead of
  * parsing the message; treat unknown codes as generic failures.
  */
-export class RelayError extends AvantisError {
+export class RelayError extends VerantaError {
   override name = "RelayError";
   readonly requestId?: string;
   readonly code?: string;
@@ -113,7 +113,7 @@ export class RelayTimeoutError extends RelayError {
 }
 
 /** JSON-RPC failure when using the direct route. */
-export class RpcError extends AvantisError {
+export class RpcError extends VerantaError {
   override name = "RpcError";
   readonly code?: number;
   readonly data?: unknown;
@@ -126,7 +126,7 @@ export class RpcError extends AvantisError {
 }
 
 /** An on-chain transaction was mined but reverted. */
-export class TransactionRevertedError extends AvantisError {
+export class TransactionRevertedError extends VerantaError {
   override name = "TransactionRevertedError";
   readonly txHash?: string;
 
@@ -137,7 +137,7 @@ export class TransactionRevertedError extends AvantisError {
 }
 
 /** Delegation is missing, disabled, or expired for the configured signer. */
-export class DelegationError extends AvantisError {
+export class DelegationError extends VerantaError {
   override name = "DelegationError";
 }
 

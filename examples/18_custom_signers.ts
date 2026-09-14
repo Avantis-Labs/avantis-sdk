@@ -3,21 +3,21 @@
  *
  * - 0x private key (simplest)
  * - viem LocalAccount (mnemonic, hardware, KMS adapters)
- * - viem WalletClient (browser wallets — see avantis-sdk/react)
- * - your own AvantisSigner implementation (HSM, remote signer, ...)
+ * - viem WalletClient (browser wallets — see veranta-sdk/react)
+ * - your own VerantaSigner implementation (HSM, remote signer, ...)
  */
 
-import { Avantis, type AvantisSigner } from "avantis-sdk";
+import { Veranta, type VerantaSigner } from "veranta-sdk";
 import { mnemonicToAccount } from "viem/accounts";
 
-// viem account (a KMS-backed viem account works identically, e.g. from
-// "@aws-kms-signer/viem"-style adapters that expose signTypedData):
+// viem account (for AWS KMS use `kmsAccount` / `KmsSigner` from
+// "veranta-sdk/kms" — see examples/22_kms_signer.ts):
 const account = mnemonicToAccount("test test test test test test test test test test test junk");
-const client = new Avantis({ signer: account, network: "testnet" });
+const client = new Veranta({ signer: account, network: "testnet" });
 console.log("signer:", client.signer!.address);
 
 // Or fully custom — implement the 4-method interface:
-const custom: AvantisSigner = {
+const custom: VerantaSigner = {
   address: account.address,
   canSignAuthorization: true,
   canSendTransaction: false,
@@ -31,5 +31,5 @@ const custom: AvantisSigner = {
     throw new Error("not supported");
   },
 };
-const client2 = new Avantis({ signer: custom, network: "testnet" });
+const client2 = new Veranta({ signer: custom, network: "testnet" });
 console.log("custom signer:", client2.signer!.address);

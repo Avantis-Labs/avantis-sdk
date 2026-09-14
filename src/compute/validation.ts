@@ -1,5 +1,5 @@
 /**
- * Pre-trade validation: same rules the Avantis UI enforces.
+ * Pre-trade validation: same rules the Veranta UI enforces.
  *
  * Note the tx-builder API also validates server-side (min position,
  * leverage envelope, headroom, market hours) and returns human-readable

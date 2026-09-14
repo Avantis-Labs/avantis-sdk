@@ -7,9 +7,9 @@
  *   operator, executed when the trigger price hits. Keep the entityId.
  */
 
-import { Avantis, partialTriggers, positionSizeInAsset } from "avantis-sdk";
+import { Veranta, partialTriggers, positionSizeInAsset } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const data = await client.account.positions();
 const position = data.positions[0];

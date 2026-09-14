@@ -8,9 +8,9 @@ import type { UserData } from "../api/accountModels.js";
 import type { PairInfo, TradingSnapshot } from "../api/marketModels.js";
 import type { SpreadQuote } from "../api/markets.js";
 import type { Num } from "../types.js";
-import { avantisKeys } from "./keys.js";
+import { verantaKeys } from "./keys.js";
 import type { LivePrice } from "./priceFeed.js";
-import { useAvantisContext } from "./provider.js";
+import { useVerantaContext } from "./provider.js";
 
 /** The connected trader address (wagmi account). */
 export function useTrader(): Address | undefined {
@@ -19,9 +19,9 @@ export function useTrader(): Address | undefined {
 
 /** Full /v2/trading snapshot (5s cache in the core client). */
 export function useTradingSnapshot(options: { refetchIntervalMs?: number } = {}) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   return useQuery({
-    queryKey: avantisKeys.pairs(readClient.config.network),
+    queryKey: verantaKeys.pairs(readClient.config.network),
     queryFn: () => readClient.markets.snapshot(),
     refetchInterval: options.refetchIntervalMs ?? 15_000,
   }) as UseQueryResult<TradingSnapshot>;
@@ -29,9 +29,9 @@ export function useTradingSnapshot(options: { refetchIntervalMs?: number } = {})
 
 /** All pairs keyed by index. */
 export function usePairs() {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   return useQuery({
-    queryKey: [...avantisKeys.pairs(readClient.config.network), "map"],
+    queryKey: [...verantaKeys.pairs(readClient.config.network), "map"],
     queryFn: async () => await readClient.markets.pairs(),
     refetchInterval: 15_000,
   }) as UseQueryResult<Map<number, PairInfo>>;
@@ -39,9 +39,9 @@ export function usePairs() {
 
 /** One pair by symbol ("ETH/USD") or index. */
 export function usePair(ref: string | number | undefined) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   return useQuery({
-    queryKey: avantisKeys.pair(readClient.config.network, ref ?? ""),
+    queryKey: verantaKeys.pair(readClient.config.network, ref ?? ""),
     queryFn: async () => await readClient.markets.pair(ref!),
     enabled: ref !== undefined,
   }) as UseQueryResult<PairInfo>;
@@ -54,7 +54,7 @@ export function usePair(ref: string | number | undefined) {
  * the value so it renders quickly).
  */
 export function usePrice(ref: string | number | undefined): LivePrice | undefined {
-  const { readClient, priceFeed } = useAvantisContext();
+  const { readClient, priceFeed } = useVerantaContext();
   const pairQuery = usePair(ref);
   const pairIndex = pairQuery.data?.index;
 
@@ -97,11 +97,11 @@ export function useSpread(
   },
   options: { enabled?: boolean; refetchIntervalMs?: number } = {},
 ) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   const trader = useTrader();
   const stableArgs = useMemo(() => JSON.stringify(args), [args]);
   return useQuery({
-    queryKey: avantisKeys.spread(readClient.config.network, ref ?? "", stableArgs),
+    queryKey: verantaKeys.spread(readClient.config.network, ref ?? "", stableArgs),
     queryFn: async () => await readClient.markets.spread(ref!, { ...args, trader }),
     enabled: (options.enabled ?? true) && ref !== undefined,
     refetchInterval: options.refetchIntervalMs ?? 5_000,
@@ -110,9 +110,9 @@ export function useSpread(
 
 /** Live per-pair long/short OI (core API). */
 export function useOpenInterests(options: { refetchIntervalMs?: number } = {}) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   return useQuery({
-    queryKey: avantisKeys.openInterests(readClient.config.network),
+    queryKey: verantaKeys.openInterests(readClient.config.network),
     queryFn: () => readClient.markets.openInterests(),
     refetchInterval: options.refetchIntervalMs ?? 10_000,
   });
@@ -120,11 +120,11 @@ export function useOpenInterests(options: { refetchIntervalMs?: number } = {}) {
 
 /** Open positions + limit orders for the connected trader. */
 export function usePositions(options: { trader?: Address; refetchIntervalMs?: number } = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   const connected = useTrader();
   const trader = options.trader ?? connected;
   return useQuery({
-    queryKey: avantisKeys.positions(trader),
+    queryKey: verantaKeys.positions(trader),
     queryFn: async () => await client.account.positions(trader),
     enabled: !!trader,
     refetchInterval: options.refetchIntervalMs ?? 5_000,
@@ -135,11 +135,11 @@ export function usePositions(options: { trader?: Address; refetchIntervalMs?: nu
 export function useTwaps(
   options: { trader?: Address; includeCanceled?: boolean; page?: number; pageSize?: number } = {},
 ) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   const connected = useTrader();
   const trader = options.trader ?? connected;
   return useQuery({
-    queryKey: [...avantisKeys.twaps(trader), options.page ?? 0],
+    queryKey: [...verantaKeys.twaps(trader), options.page ?? 0],
     queryFn: async () => await client.account.twaps(trader, options),
     enabled: !!trader,
     refetchInterval: 10_000,
@@ -148,11 +148,27 @@ export function useTwaps(
 
 /** USDC balance + allowance (spender defaults to TradingStorage). */
 export function useAllowance(options: { spender?: Address; refetchIntervalMs?: number } = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   const trader = useTrader();
   return useQuery({
-    queryKey: avantisKeys.allowance(trader, options.spender),
+    queryKey: verantaKeys.allowance(trader, options.spender),
     queryFn: async () => await client.account.allowance(options.spender),
+    enabled: !!trader,
+    refetchInterval: options.refetchIntervalMs ?? 10_000,
+  });
+}
+
+/**
+ * USDC allowance + balance with the BuilderCode registry as spender: the
+ * builder-fee allowance (see useApproveBuilderFees). Allowances decrement as
+ * fees are charged, even "unlimited" ones, so watch it and re-approve.
+ */
+export function useBuilderFeeAllowance(options: { refetchIntervalMs?: number } = {}) {
+  const { client } = useVerantaContext();
+  const trader = useTrader();
+  return useQuery({
+    queryKey: verantaKeys.builderFeeAllowance(trader),
+    queryFn: async () => await client.account.builderFeeAllowance(),
     enabled: !!trader,
     refetchInterval: options.refetchIntervalMs ?? 10_000,
   });
@@ -160,10 +176,10 @@ export function useAllowance(options: { spender?: Address; refetchIntervalMs?: n
 
 /** USDC wallet balance in human units. */
 export function useUsdcBalance() {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   const trader = useTrader();
   return useQuery({
-    queryKey: avantisKeys.balance(trader),
+    queryKey: verantaKeys.balance(trader),
     queryFn: async () => await client.account.usdcBalance(),
     enabled: !!trader,
     refetchInterval: 10_000,
@@ -172,10 +188,10 @@ export function useUsdcBalance() {
 
 /** Delegation status for (trader, delegate). */
 export function useDelegationStatus(delegate?: Address) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   const trader = useTrader();
   return useQuery({
-    queryKey: avantisKeys.delegation(trader, delegate),
+    queryKey: verantaKeys.delegation(trader, delegate),
     queryFn: async () => await client.account.delegationStatus(delegate),
     enabled: !!trader && !!delegate,
     refetchInterval: 15_000,
@@ -184,9 +200,9 @@ export function useDelegationStatus(delegate?: Address) {
 
 /** Builder-code registry lookup. */
 export function useBuilderCodeInfo(code: string | undefined) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   return useQuery({
-    queryKey: avantisKeys.builderCode(code ?? ""),
+    queryKey: verantaKeys.builderCode(code ?? ""),
     queryFn: async () => await readClient.account.builderCode(code!),
     enabled: !!code,
   });
@@ -194,11 +210,11 @@ export function useBuilderCodeInfo(code: string | undefined) {
 
 /** Paged fill history (info API). */
 export function useTradeHistory(options: { trader?: Address; page?: number; limit?: number } = {}) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   const connected = useTrader();
   const trader = options.trader ?? connected;
   return useQuery({
-    queryKey: avantisKeys.tradeHistory(trader, options.page, options.limit),
+    queryKey: verantaKeys.tradeHistory(trader, options.page, options.limit),
     queryFn: async () =>
       await readClient.info.tradeHistory(trader!, options.page ?? 0, options.limit ?? 20),
     enabled: !!trader,
@@ -207,11 +223,11 @@ export function useTradeHistory(options: { trader?: Address; page?: number; limi
 
 /** Paged order history (info API). */
 export function useOrderHistory(options: { trader?: Address; page?: number; limit?: number } = {}) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   const connected = useTrader();
   const trader = options.trader ?? connected;
   return useQuery({
-    queryKey: avantisKeys.orderHistory(trader, options.page, options.limit),
+    queryKey: verantaKeys.orderHistory(trader, options.page, options.limit),
     queryFn: async () =>
       await readClient.info.orderHistory(trader!, options.page ?? 0, options.limit ?? 20),
     enabled: !!trader,
@@ -220,11 +236,11 @@ export function useOrderHistory(options: { trader?: Address; page?: number; limi
 
 /** Portfolio PnL summary (info API). */
 export function usePortfolioPnl(options: { trader?: Address; grouped?: boolean } = {}) {
-  const { readClient } = useAvantisContext();
+  const { readClient } = useVerantaContext();
   const connected = useTrader();
   const trader = options.trader ?? connected;
   return useQuery({
-    queryKey: [...avantisKeys.portfolio(trader), options.grouped ?? false],
+    queryKey: [...verantaKeys.portfolio(trader), options.grouped ?? false],
     queryFn: async () => await readClient.info.portfolioPnl(trader!, options),
     enabled: !!trader,
   });

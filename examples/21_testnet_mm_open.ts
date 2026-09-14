@@ -2,14 +2,14 @@
  * End-to-end testnet smoke: MM fast path on the staging stack.
  *
  * Env:
- *   AVANTIS_NETWORK=testnet
- *   AVANTIS_PRIVATE_KEY=0x...      delegate key registered on testnet
- *   AVANTIS_TRADER_ADDRESS=0x...   trader wallet
+ *   VERANTA_NETWORK=testnet
+ *   VERANTA_PRIVATE_KEY=0x...      delegate key registered on testnet
+ *   VERANTA_TRADER_ADDRESS=0x...   trader wallet
  */
 
-import { AggregatorOrderType, Avantis, signIntent } from "avantis-sdk";
+import { AggregatorOrderType, Veranta, signIntent } from "veranta-sdk";
 
-const client = new Avantis({ network: "testnet" });
+const client = new Veranta({ network: "testnet" });
 await client.account.verifyDelegation();
 
 const pairIndex = await client.markets.pairIndex("ETH/USD");

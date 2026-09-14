@@ -2,7 +2,7 @@
  * Trading mutation hooks. Each wraps the corresponding client.trade /
  * client.account method in a TanStack mutation and invalidates the
  * position/balance queries on settle (immediately + 5s + 15s, covering
- * indexer lag like the Avantis delegate UI).
+ * indexer lag like the Veranta delegate UI).
  *
  * Batched-market lifecycle events stream through the hook's `onEvent`
  * option (MarketOrderAccepted -> AttemptFailed* -> terminal).
@@ -13,8 +13,8 @@ import { useCallback } from "react";
 import type { PairRef } from "../api/trade.js";
 import type { BatchedMarketEventHook } from "../execution/batchedMarket.js";
 import type { ExecutionReceipt, MarginAction, Num, Side, TriggerType } from "../types.js";
-import { avantisKeys } from "./keys.js";
-import { useAvantisContext } from "./provider.js";
+import { verantaKeys } from "./keys.js";
+import { useVerantaContext } from "./provider.js";
 import { useTrader } from "./queries.js";
 
 export interface TradeMutationOptions {
@@ -30,10 +30,11 @@ export function useInvalidatePositions(): () => void {
   const trader = useTrader();
   return useCallback(() => {
     const invalidate = () => {
-      void queryClient.invalidateQueries({ queryKey: avantisKeys.positions(trader) });
-      void queryClient.invalidateQueries({ queryKey: avantisKeys.balance(trader) });
-      void queryClient.invalidateQueries({ queryKey: avantisKeys.allowance(trader) });
-      void queryClient.invalidateQueries({ queryKey: avantisKeys.twaps(trader) });
+      void queryClient.invalidateQueries({ queryKey: verantaKeys.positions(trader) });
+      void queryClient.invalidateQueries({ queryKey: verantaKeys.balance(trader) });
+      void queryClient.invalidateQueries({ queryKey: verantaKeys.allowance(trader) });
+      void queryClient.invalidateQueries({ queryKey: verantaKeys.builderFeeAllowance(trader) });
+      void queryClient.invalidateQueries({ queryKey: verantaKeys.twaps(trader) });
     };
     invalidate();
     setTimeout(invalidate, 5_000);
@@ -72,7 +73,7 @@ export interface MarketOpenVars {
 
 /** Open a market position (Upside pairs route as PnL automatically). */
 export function useMarketOpen(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<MarketOpenVars>(
     ({ pair, side, ...args }, onEvent) => client.trade.marketOpen(pair, side, { ...args, onEvent }),
     options,
@@ -93,7 +94,7 @@ export interface LimitOpenVars {
 
 /** Place a limit / stop-limit open order (escrows USDC on placement). */
 export function useLimitOpen(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<LimitOpenVars>(
     ({ pair, side, ...args }) => client.trade.limitOpen(pair, side, args),
     options,
@@ -112,7 +113,7 @@ export interface MarketCloseVars {
 }
 
 export function useMarketClose(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<MarketCloseVars>(
     ({ pair, tradeIndex, ...args }, onEvent) =>
       client.trade.marketClose(pair, tradeIndex, { ...args, onEvent }),
@@ -123,7 +124,7 @@ export function useMarketClose(options: TradeMutationOptions = {}) {
 // ---------------------------------------------------------------- limit mgmt
 
 export function useUpdateLimitOrder(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     pair: PairRef;
     orderIndex: number;
@@ -138,7 +139,7 @@ export function useUpdateLimitOrder(options: TradeMutationOptions = {}) {
 }
 
 export function useCancelLimitOrder(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{ pair: PairRef; orderIndex: number }>(
     ({ pair, orderIndex }) => client.trade.cancelLimitOrder(pair, orderIndex),
     options,
@@ -148,7 +149,7 @@ export function useCancelLimitOrder(options: TradeMutationOptions = {}) {
 // ---------------------------------------------------------------- position updates
 
 export function useUpdateMargin(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     pair: PairRef;
     tradeIndex: number;
@@ -162,7 +163,7 @@ export function useUpdateMargin(options: TradeMutationOptions = {}) {
 }
 
 export function useIncreasePosition(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     pair: PairRef;
     tradeIndex: number;
@@ -185,7 +186,7 @@ export function useIncreasePosition(options: TradeMutationOptions = {}) {
  * it (tp=0 resets to the max-gain cap).
  */
 export function useUpdateTpSl(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     pair: PairRef;
     tradeIndex: number;
@@ -208,7 +209,7 @@ export interface PartialTpSlVars {
 
 /** Create / update / cancel partial (off-chain) TP/SL trigger orders. */
 export function usePartialTpSl(options: { onSettled?: () => void } = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   const invalidate = useInvalidatePositions();
   const settled = () => {
     invalidate();
@@ -234,7 +235,7 @@ export function usePartialTpSl(options: { onSettled?: () => void } = {}) {
 // ---------------------------------------------------------------- TWAP
 
 export function useTwapOpen(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     pair: PairRef;
     side: Side;
@@ -247,7 +248,7 @@ export function useTwapOpen(options: TradeMutationOptions = {}) {
 }
 
 export function useTwapClose(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     pair: PairRef;
     tradeIndex: number;
@@ -257,7 +258,7 @@ export function useTwapClose(options: TradeMutationOptions = {}) {
 }
 
 export function useTwapCancel(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{ twapId: number | bigint }>(
     ({ twapId }) => client.trade.twapCancel(twapId),
     options,
@@ -267,7 +268,7 @@ export function useTwapCancel(options: TradeMutationOptions = {}) {
 // ---------------------------------------------------------------- builder codes
 
 export function useRegisterBuilderCode(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     code: string;
     feeCollector: `0x${string}`;
@@ -278,7 +279,7 @@ export function useRegisterBuilderCode(options: TradeMutationOptions = {}) {
 }
 
 export function useModifyBuilderCode(options: TradeMutationOptions = {}) {
-  const { client } = useAvantisContext();
+  const { client } = useVerantaContext();
   return useTradeMutation<{
     code: string;
     feeCollector: `0x${string}`;

@@ -2,11 +2,11 @@
 
 import type { Address, Hex } from "viem";
 import { concatHex, encodeAbiParameters, keccak256, stringToBytes } from "viem";
-import type { AvantisConfig } from "../config.js";
+import type { VerantaConfig } from "../config.js";
 import { ConfigError, DelegationError } from "../errors.js";
 import type { ExecutionEngine } from "../execution/engine.js";
 import { signIntent } from "../signing/intents.js";
-import type { AvantisSigner } from "../signing/signer.js";
+import type { VerantaSigner } from "../signing/signer.js";
 import type { HttpTransport } from "../transport.js";
 import type { TxBuilderClient, TxBuilderMeta } from "../txbuilder.js";
 import type { CallData, ExecutionReceipt, Num } from "../types.js";
@@ -20,7 +20,7 @@ const SET_DELEGATE_WITH_SIG_SELECTOR = keccak256(
 
 export class AccountApi extends ExecutingApi {
   constructor(
-    cfg: AvantisConfig,
+    cfg: VerantaConfig,
     engine: ExecutionEngine,
     txb: TxBuilderClient,
     transport: HttpTransport,
@@ -123,7 +123,7 @@ export class AccountApi extends ExecutingApi {
     if (!ok) {
       throw new DelegationError(
         `Delegate ${signer.address} is not authorized for trader ${this.cfg.trader} ` +
-          `(status: ${JSON.stringify(status)}). Register the delegate on the Avantis ` +
+          `(status: ${JSON.stringify(status)}). Register the delegate on the Veranta ` +
           "UI or via registerDelegate().",
       );
     }
@@ -197,7 +197,7 @@ export class AccountApi extends ExecutingApi {
   async registerDelegate(
     delegate: Address,
     expirySeconds: number,
-    traderSigner: AvantisSigner,
+    traderSigner: VerantaSigner,
     options: { wait?: boolean } = {},
   ): Promise<ExecutionReceipt> {
     const intent = await this.txb.intent("/v2/intents/delegate-set", {

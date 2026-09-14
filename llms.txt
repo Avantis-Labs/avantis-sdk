@@ -1,21 +1,26 @@
-# avantis-sdk
+# veranta-sdk
 
-> Official TypeScript SDK for Avantis v2 perpetuals on Base (chain 8453).
-> viem-based, API-first (no ABIs). Gasless trading through the Avantis
+> Official TypeScript SDK for Veranta v2 perpetuals on Base (chain 8453).
+> viem-based, API-first (no ABIs). Gasless trading through the Veranta
 > relayer via signed EIP-712 intents; EIP-7702 smart-account relays;
-> optional direct mode. React hooks at `avantis-sdk/react` (wagmi v2 +
-> TanStack Query v5). Full parity with the Python avantis-trader-sdk.
+> optional direct mode. React hooks at `veranta-sdk/react` (wagmi v2 +
+> TanStack Query v5); AWS KMS signer at `veranta-sdk/kms` (Node only).
+> Full parity with the Python veranta-sdk.
 
 ## Start here
 
 - AGENTS.md: invariants, execution routing, signing rules — read first.
 - README.md: install + backend/React quickstarts.
-- examples/: 21 runnable scripts (01–21) + examples/next-app trading panel.
+- examples/: runnable scripts 00–22 (22 = AWS KMS backend signer) +
+  examples/next-app trading panel.
 
 ## Key facts
 
-- `new Avantis()` reads AVANTIS_PRIVATE_KEY / AVANTIS_TRADER_ADDRESS /
-  AVANTIS_NETWORK from env; browsers pass `{ signer: walletClient }`.
+- `new Veranta()` reads VERANTA_PRIVATE_KEY / VERANTA_TRADER_ADDRESS /
+  VERANTA_NETWORK from env; browsers pass `{ signer: walletClient }`.
+- KMS backends: `const signer = await KmsSigner.create({ keyId })` from
+  `veranta-sdk/kms`, then `new Veranta({ signer })` (needs the optional
+  peer @aws-sdk/client-kms).
 - Human units everywhere: collateral 100 = 100 USDC, leverage 10 = 10x,
   prices plain decimals. deadlines are MILLISECONDS, delegate expiry is
   SECONDS.
@@ -28,4 +33,12 @@
   `trade.partialTpSl` CRUD (off-chain triggers with entityId).
 - Session keys: react `useSessionKey()` or `account.registerDelegate` —
   delegate keys trade only, never move funds.
+- Builder codes: `new Veranta({ builderCode, builderFeePercent })` (or
+  VERANTA_BUILDER_CODE / VERANTA_BUILDER_FEE_PERCENT) attaches a per-order
+  fee, percent of notional, to market opens/closes/increases; those orders
+  relay via blitz (no SSE lifecycle), need an EIP-7702-capable signer
+  (private/session key; direct mode and bare browser wallets are refused),
+  and traders approve USDC to the BuilderCode registry
+  (`account.approveBuilderFees`) besides TradingStorage. Owners register
+  caps with `account.registerBuilderCode`; lookup `account.builderCode`.
 - Never bypass the digest assert in signing; never rename EIP-712 fields.

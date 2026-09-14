@@ -11,7 +11,7 @@ import {
   positionLeverage,
   positionOpenPrice,
   positionSide,
-} from "avantis-sdk";
+} from "veranta-sdk";
 import {
   useAllowance,
   useApproveUsdc,
@@ -21,7 +21,7 @@ import {
   usePrice,
   useSessionKey,
   useUsdcBalance,
-} from "avantis-sdk/react";
+} from "veranta-sdk/react";
 import { useState } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
@@ -80,7 +80,7 @@ export default function Page() {
 
   return (
     <main style={{ maxWidth: 640, margin: "40px auto", padding: 16 }}>
-      <h1 style={{ fontSize: 22 }}>Avantis SDK — trading panel</h1>
+      <h1 style={{ fontSize: 22 }}>Veranta SDK — trading panel</h1>
 
       <section style={card}>
         {isConnected ? (

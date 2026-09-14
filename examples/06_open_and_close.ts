@@ -1,8 +1,8 @@
 /** Open, inspect, and close a position (full close = full collateral). */
 
-import { Avantis, positionCollateral } from "avantis-sdk";
+import { Veranta, positionCollateral } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 await client.trade.marketOpen("ETH/USD", "long", { collateral: 50, leverage: 5 });
 await new Promise((resolve) => setTimeout(resolve, 3_000));

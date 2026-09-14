@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * Provider stack: WagmiProvider -> QueryClientProvider -> AvantisProvider.
+ * Provider stack: WagmiProvider -> QueryClientProvider -> VerantaProvider.
  *
  * Works with ANY wagmi-compatible wallet layer: swap `injected()` for
- * RainbowKit, ConnectKit, Privy, Reown AppKit connectors — the Avantis
+ * RainbowKit, ConnectKit, Privy, Reown AppKit connectors — the Veranta
  * hooks don't care which one you use.
  */
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AvantisProvider } from "avantis-sdk/react";
+import { VerantaProvider } from "veranta-sdk/react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { http, WagmiProvider, createConfig } from "wagmi";
@@ -20,9 +20,9 @@ const wagmiConfig = createConfig({
   chains: [base],
   connectors: [injected()],
   transports: { [base.id]: http() },
-  // Testnet (Avantis Base fork, same chainId): point BOTH layers at it —
-  //   transports: { [base.id]: http(TESTNET_RPC_URL) }   (TESTNET_RPC_URL from "avantis-sdk")
-  //   <AvantisProvider network="testnet">
+  // Testnet (Veranta Base fork, same chainId): point BOTH layers at it —
+  //   transports: { [base.id]: http(TESTNET_RPC_URL) }   (TESTNET_RPC_URL from "veranta-sdk")
+  //   <VerantaProvider network="testnet">
 });
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -30,7 +30,7 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <AvantisProvider network="mainnet">{children}</AvantisProvider>
+        <VerantaProvider network="mainnet">{children}</VerantaProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

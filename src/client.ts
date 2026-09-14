@@ -1,16 +1,16 @@
 /**
- * Avantis v2 client.
+ * Veranta v2 client.
  *
  * Backend (env-based):
  *
- *     import { Avantis } from "avantis-sdk";
+ *     import { Veranta } from "veranta-sdk";
  *
- *     const client = new Avantis(); // reads AVANTIS_* env vars
+ *     const client = new Veranta(); // reads VERANTA_* env vars
  *     await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 10 });
  *
  * Browser (wagmi wallet):
  *
- *     const client = new Avantis({ signer: walletClient, network: "mainnet" });
+ *     const client = new Veranta({ signer: walletClient, network: "mainnet" });
  */
 
 import { AccountApi } from "./api/account.js";
@@ -19,11 +19,11 @@ import { LpApi } from "./api/lp.js";
 import { MarketsApi } from "./api/markets.js";
 import { ReferralApi } from "./api/referral.js";
 import { TradeApi } from "./api/trade.js";
-import { type AvantisConfig, type AvantisConfigInput, resolveConfig } from "./config.js";
+import { type VerantaConfig, type VerantaConfigInput, resolveConfig } from "./config.js";
 import { ConfigError } from "./errors.js";
 import { ExecutionEngine } from "./execution/engine.js";
 import { LocalIntentBuilder } from "./execution/localIntents.js";
-import { type AvantisSigner, type SignerSource, toSigner } from "./signing/signer.js";
+import { type SignerSource, type VerantaSigner, toSigner } from "./signing/signer.js";
 import {
   HermesPriceStream,
   LazerPriceStream,
@@ -33,18 +33,18 @@ import {
 import { HttpTransport } from "./transport.js";
 import { TxBuilderClient, type TxBuilderMeta } from "./txbuilder.js";
 
-export interface AvantisOptions extends AvantisConfigInput {
+export interface VerantaOptions extends VerantaConfigInput {
   /**
    * Signing key source: a 0x private key, a viem LocalAccount, a viem
-   * WalletClient (browser wallets via wagmi), or a custom AvantisSigner.
-   * Falls back to `privateKey` / AVANTIS_PRIVATE_KEY.
+   * WalletClient (browser wallets via wagmi), or a custom VerantaSigner.
+   * Falls back to `privateKey` / VERANTA_PRIVATE_KEY.
    */
   signer?: SignerSource;
 }
 
-export class Avantis {
-  readonly config: AvantisConfig;
-  readonly signer?: AvantisSigner;
+export class Veranta {
+  readonly config: VerantaConfig;
+  readonly signer?: VerantaSigner;
   readonly transport: HttpTransport;
   readonly txb: TxBuilderClient;
   readonly engine: ExecutionEngine;
@@ -57,7 +57,7 @@ export class Avantis {
   private referralApi?: ReferralApi;
   private lpApi?: LpApi;
 
-  constructor(options: AvantisOptions = {}) {
+  constructor(options: VerantaOptions = {}) {
     const { signer, ...configInput } = options;
     this.config = resolveConfig(configInput);
     const source = signer ?? this.config.privateKey;

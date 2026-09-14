@@ -4,28 +4,31 @@
  *
  * Environment variables (Node only; browsers pass explicit options):
  *
- * - `AVANTIS_PRIVATE_KEY`    the signing key (delegate/agent key or trader key)
- * - `AVANTIS_TRADER_ADDRESS` if set and != key's address -> delegate mode
- * - `AVANTIS_EXECUTION`      "relayer" (default) | "direct"
- * - `AVANTIS_RPC_URL`        Base RPC. Required for execution=direct
+ * - `VERANTA_PRIVATE_KEY`    the signing key (delegate/agent key or trader key)
+ * - `VERANTA_TRADER_ADDRESS` if set and != key's address -> delegate mode
+ * - `VERANTA_EXECUTION`      "relayer" (default) | "direct"
+ * - `VERANTA_RPC_URL`        Base RPC. Required for execution=direct
  *                            (broadcast) and for relayer mode when signing
  *                            with the trader EOA directly (reads the
  *                            EIP-7702 authorization nonce). Not needed with
  *                            a delegate/API key (the normal setup).
- * - `AVANTIS_NETWORK`        "mainnet" (default) | "testnet"
- * - `AVANTIS_API_BASE_URL`   central-routing host (prod-api / staging-api);
+ * - `VERANTA_NETWORK`        "mainnet" (default) | "testnet"
+ * - `VERANTA_API_BASE_URL`   central-routing host (prod-api / staging-api);
  *                            /core, /twap, /batched-market, /blitz, /data
  *                            and /risk/v2 are derived from it unless
  *                            individually overridden
- * - `AVANTIS_TX_BUILDER_URL` / `AVANTIS_RELAYER_URL` / `AVANTIS_DATA_API_URL`
- *   / `AVANTIS_CORE_API_URL` / `AVANTIS_TWAP_API_URL`
- *   / `AVANTIS_BATCHED_MARKET_URL` / `AVANTIS_HISTORY_API_URL`
- *   / `AVANTIS_RISK_API_URL` / `AVANTIS_RISK_V2_API_URL`
- *   / `AVANTIS_FEED_URL`     per-service overrides
- * - `AVANTIS_BUILDER_CODE`   builder code to attribute order flow to (string
+ * - `VERANTA_TX_BUILDER_URL` / `VERANTA_RELAYER_URL` / `VERANTA_DATA_API_URL`
+ *   / `VERANTA_CORE_API_URL` / `VERANTA_TWAP_API_URL`
+ *   / `VERANTA_BATCHED_MARKET_URL` / `VERANTA_HISTORY_API_URL`
+ *   / `VERANTA_RISK_API_URL` / `VERANTA_RISK_V2_API_URL`
+ *   / `VERANTA_FEED_URL`     per-service overrides
+ * - `VERANTA_BUILDER_CODE`   builder code to attribute order flow to (string
  *                            or 0x-hex bytes32)
- * - `AVANTIS_BUILDER_FEE_PERCENT` default per-order builder fee rate,
+ * - `VERANTA_BUILDER_FEE_PERCENT` default per-order builder fee rate,
  *                            percent of notional (0.05 = 0.05%)
+ *
+ * Pre-rename `AVANTIS_*` names are still read when the `VERANTA_*` one is
+ * unset (with one console warning per variable); the new name wins.
  */
 
 import type { Address, Hex } from "viem";
@@ -78,11 +81,11 @@ const CENTRAL_ROUTES = {
 
 export const TESTNET: NetworkProfile = {
   name: "testnet",
-  apiBaseUrl: "https://staging-api.avantisfi.com",
-  txBuilderUrl: "https://tx-builder-testnet.avantisfi.com",
-  historyApiUrl: "https://testnet-api.avantisfi.com",
-  riskApiUrl: "https://risk-api-testnet-public.avantisfi.com",
-  feedUrl: "https://feed-v3-testnet.avantisfi.com",
+  apiBaseUrl: "https://staging-api.veranta.xyz",
+  txBuilderUrl: "https://tx-builder-testnet.veranta.xyz",
+  historyApiUrl: "https://testnet-api.veranta.xyz",
+  riskApiUrl: "https://risk-api-testnet-public.veranta.xyz",
+  feedUrl: "https://feed-v3-testnet.veranta.xyz",
   pusherKey: "f86bc7e9919fc938694a",
   pusherCluster: "mt1",
 };
@@ -97,14 +100,14 @@ export const TESTNET_RPC_URL = "https://base-testnet-rpc-ovh.avantisfi.com";
 
 export const MAINNET: NetworkProfile = {
   name: "mainnet",
-  apiBaseUrl: "https://prod-api.avantisfi.com",
-  txBuilderUrl: "https://tx-builder.avantisfi.com",
-  historyApiUrl: "https://api.avantisfi.com",
+  apiBaseUrl: "https://prod-api.veranta.xyz",
+  txBuilderUrl: "https://tx-builder.veranta.xyz",
+  historyApiUrl: "https://api.veranta.xyz",
   // Production spreads come from the v2 engine at {apiBaseUrl}/risk/v2
   // (markets.spread()). The legacy engine was decommissioned at the
   // 2026-08-12 cutover, so markets.dynamicSpread() throws on mainnet.
   riskApiUrl: "",
-  feedUrl: "https://feed-v3.avantisfi.com",
+  feedUrl: "https://feed-v3.veranta.xyz",
 };
 
 export const PROFILES: Record<string, NetworkProfile> = {
@@ -113,23 +116,23 @@ export const PROFILES: Record<string, NetworkProfile> = {
 };
 
 const ENV_URL_OVERRIDES = {
-  apiBaseUrl: "AVANTIS_API_BASE_URL",
-  txBuilderUrl: "AVANTIS_TX_BUILDER_URL",
-  relayerUrl: "AVANTIS_RELAYER_URL",
-  dataApiUrl: "AVANTIS_DATA_API_URL",
-  coreApiUrl: "AVANTIS_CORE_API_URL",
-  twapApiUrl: "AVANTIS_TWAP_API_URL",
-  batchedMarketUrl: "AVANTIS_BATCHED_MARKET_URL",
-  historyApiUrl: "AVANTIS_HISTORY_API_URL",
-  riskApiUrl: "AVANTIS_RISK_API_URL",
-  riskV2ApiUrl: "AVANTIS_RISK_V2_API_URL",
-  feedUrl: "AVANTIS_FEED_URL",
+  apiBaseUrl: "VERANTA_API_BASE_URL",
+  txBuilderUrl: "VERANTA_TX_BUILDER_URL",
+  relayerUrl: "VERANTA_RELAYER_URL",
+  dataApiUrl: "VERANTA_DATA_API_URL",
+  coreApiUrl: "VERANTA_CORE_API_URL",
+  twapApiUrl: "VERANTA_TWAP_API_URL",
+  batchedMarketUrl: "VERANTA_BATCHED_MARKET_URL",
+  historyApiUrl: "VERANTA_HISTORY_API_URL",
+  riskApiUrl: "VERANTA_RISK_API_URL",
+  riskV2ApiUrl: "VERANTA_RISK_V2_API_URL",
+  feedUrl: "VERANTA_FEED_URL",
 } as const;
 
 type UrlField = keyof typeof ENV_URL_OVERRIDES;
 
-/** Options accepted by the `Avantis` client constructor. */
-export interface AvantisConfigInput {
+/** Options accepted by the `Veranta` client constructor. */
+export interface VerantaConfigInput {
   // identity / execution
   /** 0x-hex private key (backend / bots). Prefer `signer` for wallets. */
   privateKey?: Hex;
@@ -193,7 +196,7 @@ export interface AvantisConfigInput {
 }
 
 /** Fully resolved SDK configuration. */
-export interface AvantisConfig {
+export interface VerantaConfig {
   privateKey?: Hex;
   trader?: Address;
   execution: ExecutionMode;
@@ -225,15 +228,37 @@ export interface AvantisConfig {
   relayPollTimeoutMs: number;
 }
 
+const LEGACY_ENV_PREFIX = "AVANTIS_"; // pre-rename names (Avantis is now Veranta)
+const warnedLegacyEnv = new Set<string>();
+
+/**
+ * Read `VERANTA_*`; fall back to the pre-rename `AVANTIS_*` name so existing
+ * deployments keep working through the rename (one console warning per
+ * variable). The new name always wins when both are set.
+ */
 function env(name: string): string | undefined {
   if (typeof process === "undefined" || !process.env) return undefined;
   const value = process.env[name];
-  return value ? value : undefined;
+  if (value) return value;
+  if (name.startsWith("VERANTA_")) {
+    const legacy = `${LEGACY_ENV_PREFIX}${name.slice("VERANTA_".length)}`;
+    const fallback = process.env[legacy];
+    if (fallback) {
+      if (!warnedLegacyEnv.has(legacy)) {
+        warnedLegacyEnv.add(legacy);
+        console.warn(
+          `[veranta-sdk] ${legacy} is deprecated (Avantis is now Veranta); set ${name} instead.`,
+        );
+      }
+      return fallback;
+    }
+  }
+  return undefined;
 }
 
 /** Build config from explicit options + env + network profile. */
-export function resolveConfig(input: AvantisConfigInput = {}): AvantisConfig {
-  const network = input.network ?? (env("AVANTIS_NETWORK") as "mainnet" | "testnet") ?? "mainnet";
+export function resolveConfig(input: VerantaConfigInput = {}): VerantaConfig {
+  const network = input.network ?? (env("VERANTA_NETWORK") as "mainnet" | "testnet") ?? "mainnet";
   const profile = PROFILES[network];
   if (!profile) {
     throw new ConfigError(
@@ -241,9 +266,9 @@ export function resolveConfig(input: AvantisConfigInput = {}): AvantisConfig {
     );
   }
 
-  const executionEnv = env("AVANTIS_EXECUTION")?.toLowerCase();
+  const executionEnv = env("VERANTA_EXECUTION")?.toLowerCase();
   if (executionEnv && executionEnv !== "relayer" && executionEnv !== "direct") {
-    throw new ConfigError(`Invalid AVANTIS_EXECUTION ${executionEnv}; use "relayer" or "direct"`);
+    throw new ConfigError(`Invalid VERANTA_EXECUTION ${executionEnv}; use "relayer" or "direct"`);
   }
 
   const urls = {} as Record<UrlField, string>;
@@ -255,13 +280,13 @@ export function resolveConfig(input: AvantisConfigInput = {}): AvantisConfig {
       "";
   }
 
-  const config: AvantisConfig = {
-    privateKey: input.privateKey ?? (env("AVANTIS_PRIVATE_KEY") as Hex | undefined),
-    trader: input.trader ?? (env("AVANTIS_TRADER_ADDRESS") as Address | undefined),
+  const config: VerantaConfig = {
+    privateKey: input.privateKey ?? (env("VERANTA_PRIVATE_KEY") as Hex | undefined),
+    trader: input.trader ?? (env("VERANTA_TRADER_ADDRESS") as Address | undefined),
     execution: input.execution ?? (executionEnv as ExecutionMode | undefined) ?? "relayer",
     rpcUrl:
       input.rpcUrl ??
-      env("AVANTIS_RPC_URL") ??
+      env("VERANTA_RPC_URL") ??
       // Testnet DX: the fork RPC is public, so default it in. Mainnet stays
       // RPC-less by default (delegate keys need none).
       (network === "testnet" ? TESTNET_RPC_URL : undefined),
@@ -283,8 +308,8 @@ export function resolveConfig(input: AvantisConfigInput = {}): AvantisConfig {
     pusherCluster: input.pusherCluster ?? profile.pusherCluster ?? "us2",
 
     delegationAddress: input.delegationAddress ?? DEFAULT_DELEGATION_ADDRESS,
-    builderCode: input.builderCode ?? env("AVANTIS_BUILDER_CODE"),
-    builderFeePercent: input.builderFeePercent ?? env("AVANTIS_BUILDER_FEE_PERCENT"),
+    builderCode: input.builderCode ?? env("VERANTA_BUILDER_CODE"),
+    builderFeePercent: input.builderFeePercent ?? env("VERANTA_BUILDER_FEE_PERCENT"),
     defaultGasLimit: input.defaultGasLimit ?? 2_000_000,
 
     timeoutMs: input.timeoutMs ?? 30_000,

@@ -1,8 +1,8 @@
 /** Deposit/withdraw margin and increase position size. */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const data = await client.account.positions();
 const position = data.positions[0];

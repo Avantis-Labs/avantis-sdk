@@ -1,20 +1,20 @@
 /**
  * Testnet (internal Base fork devnet) helpers.
  *
- * The Avantis testnet is a fork of Base mainnet: same chainId (8453) and
+ * The Veranta testnet is a fork of Base mainnet: same chainId (8453) and
  * contract addresses, its own RPC/explorer. Its rpc-proxy exposes a
  * dev-only faucet method (`dev_impersonateTransaction`) that executes
  * unsigned transactions as devnet whale wallets — so anyone can fund a
  * fresh wallet and start trading in seconds:
  *
- *     import { Avantis, fundTestnetWallet } from "avantis-sdk";
+ *     import { Veranta, fundTestnetWallet } from "veranta-sdk";
  *     import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
  *
  *     const key = generatePrivateKey();
  *     const wallet = privateKeyToAccount(key);
  *     await fundTestnetWallet(wallet.address);          // 0.05 ETH + 1,000 USDC
  *
- *     const client = new Avantis({ network: "testnet", signer: key });
+ *     const client = new Veranta({ network: "testnet", signer: key });
  *     await client.account.approveUsdc();
  *     await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 5 });
  *
@@ -71,7 +71,7 @@ export interface FundTestnetWalletResult {
 }
 
 /**
- * Fund a wallet on the Avantis testnet fork with gas ETH and test USDC
+ * Fund a wallet on the Veranta testnet fork with gas ETH and test USDC
  * (defaults: 0.05 ETH, 1,000 USDC). Idempotent-ish: skips a leg when the
  * wallet already holds at least the requested amount.
  *
@@ -84,7 +84,7 @@ export async function fundTestnetWallet(
   const rpcUrl = options.rpcUrl ?? TESTNET_RPC_URL;
   if (!/testnet/i.test(rpcUrl)) {
     throw new ConfigError(
-      `fundTestnetWallet only works against the Avantis testnet fork (got ${rpcUrl})`,
+      `fundTestnetWallet only works against the Veranta testnet fork (got ${rpcUrl})`,
     );
   }
   const rpc = new JsonRpcClient(rpcUrl);

@@ -1,6 +1,6 @@
 /**
  * Session-key (1CT) storage: a local delegate key per (network, trader),
- * persisted in localStorage like the Avantis UI's one-click-trading store.
+ * persisted in localStorage like the Veranta UI's one-click-trading store.
  *
  * The key never leaves the browser; it is registered on-chain as a trading
  * delegate (`setDelegateWithSig`) and can only trade — it cannot withdraw
@@ -10,7 +10,7 @@
 import { useSyncExternalStore } from "react";
 import type { Address, Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import type { AvantisSigner } from "../signing/signer.js";
+import type { VerantaSigner } from "../signing/signer.js";
 import { toSigner } from "../signing/signer.js";
 
 export interface SessionKeyRecord {
@@ -27,7 +27,7 @@ const listeners = new Set<() => void>();
 let revision = 0;
 
 function storageKey(network: string, trader: Address): string {
-  return `avantis-sdk.session.${network}.${trader.toLowerCase()}`;
+  return `veranta-sdk.session.${network}.${trader.toLowerCase()}`;
 }
 
 function storage(): Storage | null {
@@ -72,11 +72,11 @@ export function clearSessionKey(network: string, trader: Address): void {
   notify();
 }
 
-export function sessionSignerFromRecord(record: SessionKeyRecord): AvantisSigner {
+export function sessionSignerFromRecord(record: SessionKeyRecord): VerantaSigner {
   return sessionSignerFromKey(record.privateKey);
 }
 
-export function sessionSignerFromKey(privateKey: Hex): AvantisSigner {
+export function sessionSignerFromKey(privateKey: Hex): VerantaSigner {
   return toSigner(privateKeyToAccount(privateKey));
 }
 

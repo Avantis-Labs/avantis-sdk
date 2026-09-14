@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Providers } from "./providers";
 
-export const metadata = { title: "Avantis SDK demo" };
+export const metadata = { title: "Veranta SDK demo" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

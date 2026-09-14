@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     "react/index": "src/react/index.ts",
+    "kms/index": "src/kms/index.ts",
   },
   format: ["esm", "cjs"],
   dts: true,
@@ -19,5 +20,6 @@ export default defineConfig({
     "@tanstack/react-query",
     "socket.io-client",
     "pusher-js",
+    "@aws-sdk/client-kms",
   ],
 });

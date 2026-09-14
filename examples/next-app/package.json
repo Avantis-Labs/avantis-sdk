@@ -1,5 +1,5 @@
 {
-  "name": "avantis-next-example",
+  "name": "veranta-next-example",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.0",
-    "avantis-sdk": "file:../..",
+    "veranta-sdk": "file:../..",
     "next": "^15.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

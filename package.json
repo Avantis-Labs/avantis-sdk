@@ -1,7 +1,7 @@
 {
-  "name": "avantis-sdk",
+  "name": "veranta-sdk",
   "version": "0.1.0",
-  "description": "Official TypeScript SDK for Avantis v2 - perpetuals on Base. viem-based, API-first (no ABIs), gasless via the Avantis relayer, with React hooks at avantis-sdk/react.",
+  "description": "Official TypeScript SDK for Veranta v2 - perpetuals on Base. viem-based, API-first (no ABIs), gasless via the Veranta relayer, with React hooks at veranta-sdk/react and an AWS KMS signer at veranta-sdk/kms.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -29,12 +29,25 @@
         "default": "./dist/react/index.cjs"
       }
     },
+    "./kms": {
+      "import": {
+        "types": "./dist/kms/index.d.ts",
+        "default": "./dist/kms/index.js"
+      },
+      "require": {
+        "types": "./dist/kms/index.d.cts",
+        "default": "./dist/kms/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
     "*": {
       "react": [
         "./dist/react/index.d.ts"
+      ],
+      "kms": [
+        "./dist/kms/index.d.ts"
       ]
     }
   },
@@ -45,19 +58,21 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "node scripts/sync-version.mjs && tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "AVANTIS_E2E=1 vitest run tests/e2e --no-file-parallelism",
+    "test:e2e": "VERANTA_E2E=1 vitest run tests/e2e --no-file-parallelism",
     "typecheck": "tsc --noEmit",
     "lint": "biome check src tests",
     "lint:fix": "biome check --write src tests",
     "check:package": "pnpm build && publint && attw --pack .",
     "changeset": "changeset",
-    "release": "pnpm build && changeset publish"
+    "release": "pnpm build && changeset publish",
+    "version:sync": "node scripts/sync-version.mjs"
   },
   "peerDependencies": {
+    "@aws-sdk/client-kms": ">=3",
     "@tanstack/react-query": ">=5",
     "react": ">=18",
     "socket.io-client": ">=4",
@@ -65,6 +80,9 @@
     "wagmi": ">=2.12"
   },
   "peerDependenciesMeta": {
+    "@aws-sdk/client-kms": {
+      "optional": true
+    },
     "@tanstack/react-query": {
       "optional": true
     },
@@ -80,6 +98,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
+    "@aws-sdk/client-kms": "^3.1131.0",
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.9",
     "@tanstack/react-query": "^5.62.0",
@@ -99,7 +118,7 @@
     "node": ">=20"
   },
   "keywords": [
-    "avantis",
+    "veranta",
     "perpetuals",
     "trading",
     "base",

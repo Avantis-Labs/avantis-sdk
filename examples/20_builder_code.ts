@@ -10,10 +10,10 @@
  * (approveBuilderFees) in addition to the normal TradingStorage approval.
  */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
 // --- owner: register the code (once) --------------------------------------
-const owner = new Avantis();
+const owner = new Veranta();
 const info = await owner.account.builderCode("MYAPP");
 if (!info.registered) {
   await owner.account.registerBuilderCode("MYAPP", {
@@ -28,12 +28,12 @@ if (!info.registered) {
 }
 
 // --- trader: one-time fee allowance ----------------------------------------
-const trader = new Avantis(); // trader key
+const trader = new Veranta(); // trader key
 await trader.account.approveBuilderFees(); // unlimited; pass an amount to cap
 console.log("fee allowance:", await trader.account.builderFeeAllowance());
 
 // --- app: attach the code to order flow ------------------------------------
-const app = new Avantis({
+const app = new Veranta({
   builderCode: "MYAPP",
   builderFeePercent: 0.05, // 0.05% of notional per order; 0 = attribution only
 });

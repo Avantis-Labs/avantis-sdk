@@ -1,28 +1,28 @@
 /**
- * Avantis v2 TypeScript SDK: API-first perpetuals trading on Base.
+ * Veranta v2 TypeScript SDK: API-first perpetuals trading on Base.
  *
- * Quick start (relayer route, delegate key from the Avantis UI):
+ * Quick start (relayer route, delegate key from the Veranta UI):
  *
- *     export AVANTIS_PRIVATE_KEY=0x...      # your API/agent key
- *     export AVANTIS_TRADER_ADDRESS=0x...   # your wallet
+ *     export VERANTA_PRIVATE_KEY=0x...      # your API/agent key
+ *     export VERANTA_TRADER_ADDRESS=0x...   # your wallet
  *
- *     import { Avantis } from "avantis-sdk";
+ *     import { Veranta } from "veranta-sdk";
  *
- *     const client = new Avantis();
+ *     const client = new Veranta();
  *     await client.trade.marketOpen("ETH/USD", "long", { collateral: 100, leverage: 10 });
  *
- * React hooks live at `avantis-sdk/react`.
+ * React hooks live at `veranta-sdk/react`.
  */
 
 export { VERSION } from "./version.js";
 
 // client
-export { Avantis, type AvantisOptions } from "./client.js";
+export { Veranta, type VerantaOptions } from "./client.js";
 
 // config
 export {
-  type AvantisConfig,
-  type AvantisConfigInput,
+  type VerantaConfig,
+  type VerantaConfigInput,
   DEFAULT_DELEGATION_ADDRESS,
   MAINNET,
   type NetworkProfile,
@@ -43,7 +43,7 @@ export {
 export {
   ApiError,
   apiErrorFromEnvelope,
-  AvantisError,
+  VerantaError,
   ConfigError,
   DelegationError,
   DigestMismatchError,
@@ -103,7 +103,7 @@ export {
   tradingDomain,
 } from "./signing/schema.js";
 export {
-  type AvantisSigner,
+  type VerantaSigner,
   normalizeSignature,
   type SignedAuthorization,
   type SignerSource,
@@ -227,5 +227,5 @@ export {
   type PriceUpdate,
 } from "./streams/index.js";
 
-// compute (also importable as a namespace: `import * as compute from "avantis-sdk/compute"`)
+// compute (also importable as a namespace: `import * as compute from "veranta-sdk/compute"`)
 export * as compute from "./compute/index.js";

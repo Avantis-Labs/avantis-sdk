@@ -1,8 +1,8 @@
 /** Limit / stop-limit orders: place, edit, cancel. Escrows USDC on placement. */
 
-import { Avantis, limitOrderPrice } from "avantis-sdk";
+import { Veranta, limitOrderPrice } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const price = await client.markets.price("ETH/USD");
 console.log("market:", price);

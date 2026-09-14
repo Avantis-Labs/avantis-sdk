@@ -4,9 +4,9 @@
  * Not available on Upside pairs.
  */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const receipt = await client.trade.twapOpen("ETH/USD", "long", {
   collateral: 100,

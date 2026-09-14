@@ -11,9 +11,9 @@
  * and the terminal event, which is delivered even when the call throws.
  */
 
-import { Avantis, type BatchedMarketEvent } from "avantis-sdk";
+import { Veranta, type BatchedMarketEvent } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 function journey(event: BatchedMarketEvent): void {
   const code = event.data.code;

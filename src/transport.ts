@@ -50,7 +50,7 @@ export class HttpTransport {
   private baseHeaders(extra?: Record<string, string>): Record<string, string> {
     const headers: Record<string, string> = { ...extra };
     // Browsers forbid setting User-Agent (and it would trigger preflights).
-    if (!IS_BROWSER) headers["User-Agent"] = `avantis-sdk/${VERSION}`;
+    if (!IS_BROWSER) headers["User-Agent"] = `veranta-sdk/${VERSION}`;
     return headers;
   }
 

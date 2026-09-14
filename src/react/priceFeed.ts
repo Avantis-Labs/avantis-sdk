@@ -2,7 +2,7 @@
  * Shared live-price store: one Lazer SSE stream fanned out to every
  * `usePrice` subscriber.
  *
- * Transport (mirrors the production Avantis UI):
+ * Transport (mirrors the production Veranta UI):
  * - "worker" (default in browsers): the SSE stream + JSON parsing run in a
  *   dedicated Web Worker spawned from an inline Blob (no bundler config),
  *   so heavy tick traffic never competes with React renders on the main
@@ -13,7 +13,7 @@
  */
 
 import type { PairInfo } from "../api/marketModels.js";
-import type { Avantis } from "../client.js";
+import type { Veranta } from "../client.js";
 import type { LazerPriceStream } from "../streams/prices.js";
 import { type PriceWorkerMessage, createPriceWorker } from "./priceWorker.js";
 
@@ -37,7 +37,7 @@ export class PriceFeedStore {
   private restartTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
-    private readonly client: Avantis,
+    private readonly client: Veranta,
     private readonly transport: PriceTransport = "worker",
   ) {}
 

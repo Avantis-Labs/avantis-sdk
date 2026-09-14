@@ -18,7 +18,7 @@
 
 import type { Address, Hex } from "viem";
 import { concatHex, encodeAbiParameters, keccak256, numberToHex, stringToBytes } from "viem";
-import type { AvantisSigner, SignedAuthorization } from "../signing/signer.js";
+import type { SignedAuthorization, VerantaSigner } from "../signing/signer.js";
 
 /** ERC-7821: callType=0x01 (batch), execType=0x00, selector=0x78210001 (op-data mode). */
 export const EXECUTION_MODE_OP_DATA: Hex =
@@ -84,7 +84,7 @@ export class GelatoDelegationEncoder {
   private readonly authCache = new Map<number, SignedAuthorization>();
 
   constructor(
-    readonly signer: AvantisSigner,
+    readonly signer: VerantaSigner,
     readonly chainId: number,
     readonly delegationAddress: Address,
   ) {}

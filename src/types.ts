@@ -1,5 +1,5 @@
 /**
- * Core enums and shared models for the Avantis v2 SDK.
+ * Core enums and shared models for the Veranta v2 SDK.
  *
  * Unit conventions:
  * - All SDK-facing amounts are HUMAN units: 100 = 100 USDC, 10 = 10x

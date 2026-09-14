@@ -1,7 +1,7 @@
 /**
  * USDC approvals from the browser.
  *
- * Strategies (mirrors the Avantis delegate UI):
+ * Strategies (mirrors the Veranta delegate UI):
  * - "permit": gasless — the trader wallet signs an EIP-2612 Permit, a
  *   throwaway EIP-7702 account relays `USDC.permit(...)` through blitz.
  *   Works for EOAs (no ETH needed).
@@ -15,14 +15,14 @@ import type { Address, Hex, PublicClient, WalletClient } from "viem";
 import { encodeFunctionData, hexToSignature, maxUint256, parseUnits } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
-import { Avantis } from "../client.js";
+import { Veranta } from "../client.js";
 import { GelatoDelegationEncoder } from "../eip7702/account.js";
 import { ConfigError } from "../errors.js";
 import { RelayerClient } from "../execution/relayer.js";
 import { toSigner } from "../signing/signer.js";
 import type { ExecutionReceipt, Num } from "../types.js";
 import { useInvalidatePositions } from "./mutations.js";
-import { useAvantisContext } from "./provider.js";
+import { useVerantaContext } from "./provider.js";
 
 const PERMIT_GAS = 300_000;
 
@@ -58,46 +58,107 @@ const USDC_PERMIT_ABI = [
   },
 ] as const;
 
+export type ApproveStrategy = "auto" | "permit" | "wallet";
+
 export interface ApproveUsdcVars {
   /** Human USDC; omit for unlimited. */
   amount?: Num;
   /** Defaults to TradingStorage (collateral). */
   spender?: Address;
-  strategy?: "auto" | "permit" | "wallet";
+  strategy?: ApproveStrategy;
 }
 
-export function useApproveUsdc(options: { onSuccess?: (receipt: ExecutionReceipt) => void } = {}) {
-  const { config } = useAvantisContext();
+export interface ApproveBuilderFeesVars {
+  /** Human USDC; omit for unlimited (allowances decrement as fees are charged). */
+  amount?: Num;
+  strategy?: ApproveStrategy;
+}
+
+interface ApproveHookOptions {
+  onSuccess?: (receipt: ExecutionReceipt) => void;
+}
+
+/** Wallet-side context shared by the approval hooks (approvals are trader-wallet-scoped). */
+function useApprovalContext() {
+  const { config } = useVerantaContext();
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
+  return { config, address, walletClient, publicClient };
+}
+
+type ApprovalContext = ReturnType<typeof useApprovalContext>;
+
+/** Permit-gasless first (unless strategy=wallet), wallet-transaction fallback. */
+async function approveWithStrategy(
+  ctx: ApprovalContext,
+  vars: ApproveUsdcVars,
+): Promise<ExecutionReceipt> {
+  const { config, address, walletClient, publicClient } = ctx;
+  if (!address || !walletClient) {
+    throw new ConfigError("Connect a wallet before approving USDC");
+  }
+  const strategy = vars.strategy ?? "auto";
+  // Approvals are msg.sender-scoped: always the TRADER wallet, never a
+  // session key, so build a wallet-signer client here.
+  const walletVeranta = new Veranta({ ...config, signer: walletClient });
+
+  if (strategy !== "wallet") {
+    try {
+      return await permitGasless(walletVeranta, {
+        owner: address,
+        walletClient: walletClient as unknown as WalletClient,
+        publicClient: publicClient as unknown as PublicClient | undefined,
+        amount: vars.amount,
+        spender: vars.spender,
+      });
+    } catch (error) {
+      if (strategy === "permit") throw error;
+      // auto: fall through to the wallet transaction
+    }
+  }
+  return await walletVeranta.account.approveUsdc(vars.amount, { spender: vars.spender });
+}
+
+/** Approve USDC to TradingStorage (collateral), or to any `spender`, from the connected wallet. */
+export function useApproveUsdc(options: ApproveHookOptions = {}) {
+  const ctx = useApprovalContext();
   const invalidate = useInvalidatePositions();
 
   return useMutation({
-    mutationFn: async (vars: ApproveUsdcVars = {}): Promise<ExecutionReceipt> => {
-      if (!address || !walletClient) {
-        throw new ConfigError("Connect a wallet before approving USDC");
-      }
-      const strategy = vars.strategy ?? "auto";
-      // Approvals are msg.sender-scoped: always the TRADER wallet, never a
-      // session key, so build a wallet-signer client here.
-      const walletAvantis = new Avantis({ ...config, signer: walletClient });
+    mutationFn: async (vars: ApproveUsdcVars = {}): Promise<ExecutionReceipt> =>
+      await approveWithStrategy(ctx, vars),
+    onSuccess: (receipt) => {
+      invalidate();
+      options.onSuccess?.(receipt);
+    },
+  });
+}
 
-      if (strategy !== "wallet") {
-        try {
-          return await permitGasless(walletAvantis, {
-            owner: address,
-            walletClient: walletClient as unknown as WalletClient,
-            publicClient: publicClient as unknown as PublicClient | undefined,
-            amount: vars.amount,
-            spender: vars.spender,
-          });
-        } catch (error) {
-          if (strategy === "permit") throw error;
-          // auto: fall through to the wallet transaction
-        }
+/**
+ * Approve USDC to the BuilderCode registry: the builder-fee allowance.
+ *
+ * Trading through a builder that charges fees needs TWO approvals from the
+ * trader wallet, both to audited protocol contracts: TradingStorage for
+ * collateral (useApproveUsdc) and the BuilderCode registry for fees (this
+ * hook). Never approve the builder's own wallet or the session key. The
+ * registry address is read from /v2/meta (`addresses.builderCode`); the
+ * permit-gasless / wallet strategies are the same as useApproveUsdc.
+ * Allowances decrement as fees are charged, so pair it with
+ * useBuilderFeeAllowance and re-approve when low.
+ */
+export function useApproveBuilderFees(options: ApproveHookOptions = {}) {
+  const ctx = useApprovalContext();
+  const { readClient } = useVerantaContext();
+  const invalidate = useInvalidatePositions();
+
+  return useMutation({
+    mutationFn: async (vars: ApproveBuilderFeesVars = {}): Promise<ExecutionReceipt> => {
+      const registry = (await readClient.meta()).addresses.builderCode as Address | undefined;
+      if (!registry) {
+        throw new ConfigError("tx-builder /v2/meta carries no builderCode address");
       }
-      return await walletAvantis.account.approveUsdc(vars.amount, { spender: vars.spender });
+      return await approveWithStrategy(ctx, { ...vars, spender: registry });
     },
     onSuccess: (receipt) => {
       invalidate();
@@ -107,7 +168,7 @@ export function useApproveUsdc(options: { onSuccess?: (receipt: ExecutionReceipt
 }
 
 async function permitGasless(
-  client: Avantis,
+  client: Veranta,
   args: {
     owner: Address;
     walletClient: WalletClient;

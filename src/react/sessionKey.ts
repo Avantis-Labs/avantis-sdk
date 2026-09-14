@@ -1,6 +1,6 @@
 /**
  * One-click trading (1CT) session keys: the delegate-onboarding flow from
- * the Avantis UI / delegate UI as a single hook.
+ * the Veranta UI / delegate UI as a single hook.
  *
  * `enable()` generates a fresh local key, has the TRADER wallet sign one
  * EIP-712 `DelegateReq` (with the ToS text), relays `setDelegateWithSig`
@@ -19,11 +19,11 @@ import { useMemo } from "react";
 import type { Address, Hex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { useAccount, useWalletClient } from "wagmi";
-import { Avantis } from "../client.js";
+import { Veranta } from "../client.js";
 import { ConfigError } from "../errors.js";
 import { toSigner } from "../signing/signer.js";
-import { avantisKeys } from "./keys.js";
-import { useAvantisContext } from "./provider.js";
+import { verantaKeys } from "./keys.js";
+import { useVerantaContext } from "./provider.js";
 import {
   type SessionKeyRecord,
   clearSessionKey,
@@ -54,7 +54,7 @@ export interface UseSessionKeyResult {
 }
 
 export function useSessionKey(): UseSessionKeyResult {
-  const { config, readClient } = useAvantisContext();
+  const { config, readClient } = useVerantaContext();
   const network = readClient.config.network;
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -65,11 +65,11 @@ export function useSessionKey(): UseSessionKeyResult {
   const record = address ? readSessionKeyRaw(network, address) : null;
 
   // Verify on-chain state for stored keys (registration can be revoked
-  // elsewhere, e.g. the Avantis UI).
+  // elsewhere, e.g. the Veranta UI).
   const statusQuery = useQuery({
-    queryKey: avantisKeys.delegation(address, record?.address),
+    queryKey: verantaKeys.delegation(address, record?.address),
     queryFn: async () => {
-      const probe = new Avantis({ ...config, trader: address });
+      const probe = new Veranta({ ...config, trader: address });
       return await probe.txb.delegation(address!, record!.address);
     },
     enabled: !!address && !!record?.registered,
@@ -105,7 +105,7 @@ export function useSessionKey(): UseSessionKeyResult {
       // The SESSION key relays setDelegateWithSig (it signs the EIP-7702
       // leg; submission is permissionless), the TRADER wallet signs the
       // DelegateReq intent.
-      const sessionClient = new Avantis({ ...config, signer: account, trader: address });
+      const sessionClient = new Veranta({ ...config, signer: account, trader: address });
       try {
         await sessionClient.account.registerDelegate(
           account.address,
@@ -120,7 +120,7 @@ export function useSessionKey(): UseSessionKeyResult {
           if (delegation?.canSignIntents) {
             const active = { ...pending, registered: true };
             writeSessionKey(network, active);
-            void queryClient.invalidateQueries({ queryKey: avantisKeys.all });
+            void queryClient.invalidateQueries({ queryKey: verantaKeys.all });
             return active;
           }
           await new Promise((resolve) => setTimeout(resolve, 2_000));
@@ -141,10 +141,10 @@ export function useSessionKey(): UseSessionKeyResult {
       if (!walletClient) throw new ConfigError("Wallet client not ready yet");
       // removeDelegate is msg.sender-scoped: it must be a trader-wallet
       // transaction (the engine falls back to a wallet tx automatically).
-      const walletAvantis = new Avantis({ ...config, signer: walletClient });
-      await walletAvantis.account.revokeDelegate(record.address);
+      const walletVeranta = new Veranta({ ...config, signer: walletClient });
+      await walletVeranta.account.revokeDelegate(record.address);
       clearSessionKey(network, address);
-      void queryClient.invalidateQueries({ queryKey: avantisKeys.all });
+      void queryClient.invalidateQueries({ queryKey: verantaKeys.all });
     },
   });
 

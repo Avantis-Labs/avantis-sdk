@@ -3,9 +3,9 @@
  * Referral actions are caller-scoped: trader key only.
  */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 // Register your own code (gasless via RegisterCodeReq intent):
 await client.referral.registerCodeGasless("MYCODE");

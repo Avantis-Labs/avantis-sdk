@@ -1,7 +1,7 @@
 /**
  * Order-execution event stream (Pusher public channels).
  *
- * The Avantis operator publishes per-trader execution events on channel
+ * The Veranta operator publishes per-trader execution events on channel
  * `events-{traderAddress}`: `OrderPickedUpForExecution`,
  * `ExecutionConfirmedInFlashblock`, `OrderFilled`, `OrderCanceled`.
  *
@@ -36,7 +36,7 @@ export class OrderEventStream {
     const cluster = options.cluster ?? "us2";
     this.url =
       `wss://ws-${cluster}.pusher.com/app/${pusherKey}` +
-      "?protocol=7&client=avantis-sdk&version=2.0";
+      "?protocol=7&client=veranta-sdk&version=2.0";
     this.channel = `events-${trader}`;
   }
 

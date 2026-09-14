@@ -17,8 +17,9 @@
     "noEmit": true,
     "types": ["node"],
     "paths": {
-      "avantis-sdk": ["./src/index.ts"],
-      "avantis-sdk/react": ["./src/react/index.ts"]
+      "veranta-sdk": ["./src/index.ts"],
+      "veranta-sdk/react": ["./src/react/index.ts"],
+      "veranta-sdk/kms": ["./src/kms/index.ts"]
     }
   },
   "include": ["src", "tests", "examples/*.ts"],

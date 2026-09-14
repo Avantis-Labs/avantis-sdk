@@ -19,7 +19,7 @@
  * TWAP.
  */
 
-import type { AvantisConfig } from "../config.js";
+import type { VerantaConfig } from "../config.js";
 import { ApiError, ConfigError, RelayTimeoutError, ValidationError } from "../errors.js";
 import type { BatchedMarketEventHook } from "../execution/batchedMarket.js";
 import type { ExecutionEngine } from "../execution/engine.js";
@@ -52,7 +52,7 @@ export class TradeApi extends ExecutingApi {
   private local: LocalIntentBuilder | null = null; // lazy; for locally-built intents
 
   constructor(
-    cfg: AvantisConfig,
+    cfg: VerantaConfig,
     engine: ExecutionEngine,
     txb: TxBuilderClient,
     transport: HttpTransport,
@@ -115,7 +115,7 @@ export class TradeApi extends ExecutingApi {
       if (override !== undefined) {
         throw new ConfigError(
           "builderFeePercent was passed but no builder code is configured. Set " +
-            "builderCode (or AVANTIS_BUILDER_CODE).",
+            "builderCode (or VERANTA_BUILDER_CODE).",
         );
       }
       return {};
@@ -132,15 +132,36 @@ export class TradeApi extends ExecutingApi {
   }
 
   /**
+   * Builder-fee orders only charge when the type-4 relay runs the canonical
+   * delegation template, which needs an EIP-7702 authorization signed by
+   * the SDK's signer. A browser wallet (JSON-RPC account) cannot sign one:
+   * `submitPassthrough` would fall back to a plain wallet transaction that
+   * places the order and charges NO fee. Refuse up front instead — the
+   * same reasoning as the direct-mode refusal in `submitMarket`.
+   */
+  private requireBuilderCapableSigner(): void {
+    if (!this.engine.requireSigner().canSignAuthorization) {
+      throw new ConfigError(
+        "Builder fees need an EIP-7702-capable signer (private key or session key): the fee " +
+          "is charged by the canonical delegation template inside a type-4 relay, and a " +
+          "browser wallet cannot sign that authorization (a plain wallet transaction would " +
+          "place the order without charging the fee). Trade through a session key " +
+          "(useSessionKey / account.registerDelegate) or unset builderCode.",
+      );
+    }
+  }
+
+  /**
    * Route a market open/close/increase.
    *
    * Builder-fee orders must execute their EIP-7702 leg (the fee suffix
    * lives in the calldata; the signed intent carries no builder params), so
-   * they relay straight through blitz. Everything else keeps the
-   * batched-market path with its server-side mechanism switch and SSE
-   * lifecycle. Direct mode sends a plain type-2 to the router, which never
-   * runs the fee-charging template, so builder params are refused there
-   * rather than silently charging nothing.
+   * they relay straight through blitz — which also means they need a signer
+   * that can sign EIP-7702 authorizations (requireBuilderCapableSigner).
+   * Everything else keeps the batched-market path with its server-side
+   * mechanism switch and SSE lifecycle. Direct mode sends a plain type-2 to
+   * the router, which never runs the fee-charging template, so builder
+   * params are refused there rather than silently charging nothing.
    */
   private async submitMarket(
     builder: Record<string, unknown>,
@@ -167,6 +188,7 @@ export class TradeApi extends ExecutingApi {
       });
     }
     if (Object.keys(builder).length > 0) {
+      this.requireBuilderCapableSigner();
       const calldata = await this.calldata(calldataPath, params);
       return await this.engine.submitPassthrough(calldata, { wait: options.wait });
     }
@@ -206,7 +228,8 @@ export class TradeApi extends ExecutingApi {
    * `builderFeePercent` overrides the configured builder fee rate for this
    * order (percent of notional; requires `builderCode`). Builder orders
    * relay via blitz so the fee-charging EIP-7702 leg always executes; they
-   * have no SSE lifecycle, so `onEvent` never fires for them.
+   * need a private/session-key signer (browser wallets and direct mode are
+   * refused) and have no SSE lifecycle, so `onEvent` never fires for them.
    *
    * `onEvent` (relayer route only) observes each batched-market event live
    * while the call still settles normally: the accepted event, retryable
@@ -331,7 +354,7 @@ export class TradeApi extends ExecutingApi {
    * Not available on Upside pairs (market-only; there is no PnL limit order
    * type on-chain). Note: limit opens escrow USDC on placement. On the
    * relayer route this goes through the TX_RELAY passthrough (matching the
-   * Avantis UI).
+   * Veranta UI).
    */
   async limitOpen(
     pair: PairRef,
@@ -822,7 +845,7 @@ export class TradeApi extends ExecutingApi {
    * Create a partial TP/SL trigger order.
    *
    * Signs a TpSlReq intent (no deadline by design; freshness comes from
-   * signTimestamp) and stores it with the Avantis operator via
+   * signTimestamp) and stores it with the Veranta operator via
    * `POST {core}/price-triggers`. The operator executes it on-chain when
    * the trigger price hits. Returns the stored order; keep its `entityId`
    * to update or cancel later.
@@ -1056,7 +1079,7 @@ export class TradeApi extends ExecutingApi {
   /**
    * Open an RFQ order (fill at expectedPrice ± maxSlippagePercent).
    *
-   * NOTE: RFQ is not live on Avantis yet; kept for when it ships.
+   * NOTE: RFQ is not live on Veranta yet; kept for when it ships.
    */
   async rfqOpen(
     pair: PairRef,
@@ -1085,7 +1108,7 @@ export class TradeApi extends ExecutingApi {
     return await this.passthroughOrDirect("/v2/rfq/open", params, args.wait ?? true);
   }
 
-  /** NOTE: RFQ is not live on Avantis yet; kept for when it ships. */
+  /** NOTE: RFQ is not live on Veranta yet; kept for when it ships. */
   async rfqClose(
     pair: PairRef,
     tradeIndex: number,

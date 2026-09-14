@@ -6,9 +6,9 @@
  * and pay a tiered profit share instead of fixed fees.
  */
 
-import { Avantis, compute, pairSymbol } from "avantis-sdk";
+import { Veranta, compute, pairSymbol } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const upside = await client.markets.upsidePairs();
 console.log("upside pairs:", [...upside.values()].map(pairSymbol).join(", "));

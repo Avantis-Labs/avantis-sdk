@@ -1,6 +1,6 @@
 /** Market data: pair catalog snapshot (data API) and prices (feed-v3). */
 
-import type { AvantisConfig } from "../config.js";
+import type { VerantaConfig } from "../config.js";
 import { ApiError, ConfigError } from "../errors.js";
 import type { HttpTransport } from "../transport.js";
 import { type Num, toApiNum } from "../types.js";
@@ -70,7 +70,7 @@ export class MarketsApi {
   private snapshotAt = 0;
 
   constructor(
-    private readonly cfg: AvantisConfig,
+    private readonly cfg: VerantaConfig,
     private readonly transport: HttpTransport,
   ) {}
 
@@ -124,7 +124,7 @@ export class MarketsApi {
   /**
    * The Upside twin of a fixed-fee market ("BTC/USD" -> BTC_UPSIDE/USD).
    *
-   * Matched like the Avantis UI: same symbols after stripping the `_UPSIDE`
+   * Matched like the Veranta UI: same symbols after stripping the `_UPSIDE`
    * suffix (plus the shared price feed as a sanity check). Passing an
    * upside pair returns it unchanged. Throws when the market has no upside
    * listing.
@@ -301,7 +301,7 @@ export class MarketsApi {
       throw new ConfigError(
         "The legacy risk engine is not deployed on this network (decommissioned " +
           "on mainnet at the v2 cutover); use markets.spread(), or set " +
-          "AVANTIS_RISK_API_URL to override.",
+          "VERANTA_RISK_API_URL to override.",
       );
     }
     const info = await this.pair(pair);

@@ -1,11 +1,11 @@
-# avantis-sdk examples
+# veranta-sdk examples
 
-Node scripts (run from the repo root; they import `avantis-sdk` via tsconfig paths):
+Node scripts (run from the repo root; they import `veranta-sdk` via tsconfig paths):
 
 ```bash
-export AVANTIS_PRIVATE_KEY=0x...      # delegate/API key (or trader key)
-export AVANTIS_TRADER_ADDRESS=0x...   # your wallet (delegate mode)
-export AVANTIS_NETWORK=testnet        # use testnet while experimenting
+export VERANTA_PRIVATE_KEY=0x...      # delegate/API key (or trader key)
+export VERANTA_TRADER_ADDRESS=0x...   # your wallet (delegate mode)
+export VERANTA_NETWORK=testnet        # use testnet while experimenting
 
 pnpm tsx examples/01_configure_and_meta.ts
 pnpm tsx examples/05_open_market_trade.ts
@@ -31,10 +31,11 @@ pnpm tsx examples/05_open_market_trade.ts
 | 15 | 15_referral.ts | referral codes (gasless) + stats |
 | 16 | 16_portfolio_history.ts | history + portfolio analytics |
 | 17 | 17_streams.ts | Lazer SSE prices + Pusher order events |
-| 18 | 18_custom_signers.ts | viem accounts, custom AvantisSigner |
+| 18 | 18_custom_signers.ts | viem accounts, custom VerantaSigner |
 | 19 | 19_upside_pairs.ts | Upside (PnL) markets |
 | 20 | 20_builder_code.ts | builder codes: register, allow, attach |
 | 21 | 21_testnet_mm_open.ts | end-to-end testnet smoke |
+| 22 | 22_kms_signer.ts | `KmsSigner` from veranta-sdk/kms (backend only): approvals + MM fast path |
 
 ## Next.js app (`next-app/`)
 

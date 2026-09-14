@@ -13,7 +13,7 @@ import type { Address, Hex } from "viem";
 import { hashTypedData } from "viem";
 import { DigestMismatchError } from "../errors.js";
 import type { Eip712Field, IntentPayload, SignedIntent } from "../types.js";
-import type { AvantisSigner, TypedDataPayload } from "./signer.js";
+import type { TypedDataPayload, VerantaSigner } from "./signer.js";
 
 const INT_TYPES = new Set(["uint256", "int256", "uint8", "uint192", "uint64"]);
 
@@ -85,7 +85,7 @@ export function assertIntentDigest(payload: IntentPayload): Hex {
  */
 export async function signIntent(
   payload: IntentPayload,
-  signer: AvantisSigner,
+  signer: VerantaSigner,
 ): Promise<SignedIntent> {
   assertIntentDigest(payload);
   const signature = await signer.signTypedData(toTypedDataPayload(payload));

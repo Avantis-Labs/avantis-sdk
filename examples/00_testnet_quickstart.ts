@@ -6,15 +6,15 @@
  *
  *     pnpm tsx examples/00_testnet_quickstart.ts
  *
- * (Re-running with AVANTIS_PRIVATE_KEY set reuses your wallet instead.)
+ * (Re-running with VERANTA_PRIVATE_KEY set reuses your wallet instead.)
  */
 
-import { Avantis, TESTNET_EXPLORER_URL, fundTestnetWallet } from "avantis-sdk";
+import { Veranta, TESTNET_EXPLORER_URL, fundTestnetWallet } from "veranta-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 // 1. A wallet. Fresh one by default — SAVE THE KEY if you want to keep it.
 const privateKey =
-  (process.env.AVANTIS_PRIVATE_KEY as `0x${string}` | undefined) ?? generatePrivateKey();
+  (process.env.VERANTA_PRIVATE_KEY as `0x${string}` | undefined) ?? generatePrivateKey();
 const wallet = privateKeyToAccount(privateKey);
 console.log("wallet:", wallet.address);
 console.log("key:   ", privateKey, "(save this to reuse the wallet)");
@@ -24,7 +24,7 @@ const funded = await fundTestnetWallet(wallet.address);
 console.log(`funded: ${Number(funded.ethWei) / 1e18} ETH, ${Number(funded.usdcRaw) / 1e6} USDC`);
 
 // 3. Trade.
-const client = new Avantis({ network: "testnet", signer: privateKey });
+const client = new Veranta({ network: "testnet", signer: privateKey });
 
 await client.account.approveUsdc(); // one-time; gasless via the relayer
 console.log("USDC approved");
@@ -44,5 +44,5 @@ if (position) {
   await client.trade.marketClose(position.pairIndex, position.index, {
     collateralToClose: Number(position.collateral) / 1e6,
   });
-  console.log("closed. You just did a full round trip on Avantis testnet.");
+  console.log("closed. You just did a full round trip on Veranta testnet.");
 }

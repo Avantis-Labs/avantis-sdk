@@ -1,21 +1,21 @@
 /**
- * React hooks for Avantis v2 (wagmi + TanStack Query).
+ * React hooks for Veranta v2 (wagmi + TanStack Query).
  *
- *     import { AvantisProvider, useMarketOpen, usePrice, usePositions,
- *              useSessionKey } from "avantis-sdk/react";
+ *     import { VerantaProvider, useMarketOpen, usePrice, usePositions,
+ *              useSessionKey } from "veranta-sdk/react";
  *
  * Wrap your app (inside WagmiProvider + QueryClientProvider):
  *
- *     <AvantisProvider network="mainnet">{children}</AvantisProvider>
+ *     <VerantaProvider network="mainnet">{children}</VerantaProvider>
  */
 
-export { avantisKeys } from "./keys.js";
+export { verantaKeys } from "./keys.js";
 export {
-  AvantisProvider,
-  type AvantisContextValue,
-  type AvantisProviderProps,
-  useAvantis,
-  useAvantisContext,
+  VerantaProvider,
+  type VerantaContextValue,
+  type VerantaProviderProps,
+  useVeranta,
+  useVerantaContext,
 } from "./provider.js";
 export type { LivePrice, PriceTransport } from "./priceFeed.js";
 export { createPriceWorker, supportsPriceWorker } from "./priceWorker.js";
@@ -24,6 +24,7 @@ export { createPriceWorker, supportsPriceWorker } from "./priceWorker.js";
 export {
   useAllowance,
   useBuilderCodeInfo,
+  useBuilderFeeAllowance,
   useDelegationStatus,
   useOpenInterests,
   useOrderHistory,
@@ -65,7 +66,13 @@ export {
 } from "./mutations.js";
 
 // approvals
-export { type ApproveUsdcVars, useApproveUsdc } from "./approve.js";
+export {
+  type ApproveBuilderFeesVars,
+  type ApproveStrategy,
+  type ApproveUsdcVars,
+  useApproveBuilderFees,
+  useApproveUsdc,
+} from "./approve.js";
 
 // session keys / 1CT
 export {

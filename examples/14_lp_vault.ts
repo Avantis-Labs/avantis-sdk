@@ -3,9 +3,9 @@
  * LP actions are caller-scoped: trader key only (no delegate mode).
  */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const state = await client.lp.state();
 console.log("vault state:", JSON.stringify(state).slice(0, 300));

@@ -7,9 +7,9 @@
  * schema drift fails loudly instead of reverting on-chain.
  */
 
-import { AggregatorOrderType, Avantis, signIntent } from "avantis-sdk";
+import { AggregatorOrderType, Veranta, signIntent } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 const signer = client.signer!;
 const builder = await client.localIntents(); // bootstraps from /v2/meta
 

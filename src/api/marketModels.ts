@@ -175,7 +175,7 @@ export function pairSymbol(info: PairInfo): string {
 /**
  * True for Upside markets (BTC_UPSIDE/USD, USD/JPY_UPSIDE, ...).
  *
- * Same convention as the Avantis UI: the `_UPSIDE` suffix on either symbol.
+ * Same convention as the Veranta UI: the `_UPSIDE` suffix on either symbol.
  * Upside pairs take ONLY the PnL order type (market_pnl) and are
  * market-only: no limit/stop opens, no TWAP.
  */

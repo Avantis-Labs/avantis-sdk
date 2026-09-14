@@ -1,8 +1,8 @@
 /** Live price (feed-v3) and risk-engine v2 spread quote. */
 
-import { Avantis } from "avantis-sdk";
+import { Veranta } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const price = await client.markets.price("ETH/USD");
 console.log("ETH/USD price:", price);

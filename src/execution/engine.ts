@@ -23,11 +23,11 @@
 
 import type { Address, Hex } from "viem";
 import { keccak256 } from "viem";
-import { type AvantisConfig, DEFAULT_DELEGATION_ADDRESS } from "../config.js";
+import { DEFAULT_DELEGATION_ADDRESS, type VerantaConfig } from "../config.js";
 import { type Call, GelatoDelegationEncoder, freshNonce } from "../eip7702/account.js";
 import { ConfigError, RelayError } from "../errors.js";
 import { signIntent } from "../signing/intents.js";
-import type { AvantisSigner } from "../signing/signer.js";
+import type { VerantaSigner } from "../signing/signer.js";
 import type { HttpTransport } from "../transport.js";
 import type { TxBuilderClient } from "../txbuilder.js";
 import {
@@ -58,8 +58,8 @@ export class ExecutionEngine {
   private encoderCache: GelatoDelegationEncoder | null = null;
 
   constructor(
-    readonly config: AvantisConfig,
-    readonly signer: AvantisSigner | undefined,
+    readonly config: VerantaConfig,
+    readonly signer: VerantaSigner | undefined,
     transport: HttpTransport,
     readonly txb: TxBuilderClient,
   ) {
@@ -76,10 +76,10 @@ export class ExecutionEngine {
 
   // ------------------------------------------------------------------ utils
 
-  requireSigner(): AvantisSigner {
+  requireSigner(): VerantaSigner {
     if (!this.signer) {
       throw new ConfigError(
-        "This operation requires a signer (pass `signer` or set AVANTIS_PRIVATE_KEY).",
+        "This operation requires a signer (pass `signer` or set VERANTA_PRIVATE_KEY).",
       );
     }
     return this.signer;
@@ -162,7 +162,7 @@ export class ExecutionEngine {
     throw new ConfigError(
       "Relayer mode with the trader EOA needs an RPC to read the EIP-7702 " +
         "authorization nonce (a stale nonce is skipped on-chain and the " +
-        "transaction reverts). Set rpcUrl / AVANTIS_RPC_URL to any Base RPC " +
+        "transaction reverts). Set rpcUrl / VERANTA_RPC_URL to any Base RPC " +
         "(e.g. https://mainnet.base.org), or sign with a delegate/API key.",
     );
   }
@@ -349,7 +349,7 @@ export class ExecutionEngine {
     // Nonce must come from somewhere; the tx-builder relay simulates from
     // the recovered signer, so a wrong nonce fails fast with a clear error.
     throw new ConfigError(
-      "Direct execution needs AVANTIS_RPC_URL for nonce/gas discovery. " +
+      "Direct execution needs VERANTA_RPC_URL for nonce/gas discovery. " +
         "Alternatively use execution: 'relayer' (gasless, no RPC required).",
     );
   }

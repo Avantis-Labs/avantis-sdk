@@ -6,9 +6,10 @@
  *
  * Accepted sources (`toSigner`):
  * - a 0x-hex private key (backend / bots / session keys)
- * - a viem `LocalAccount` (`privateKeyToAccount`, mnemonic, KMS adapters)
+ * - a viem `LocalAccount` (`privateKeyToAccount`, mnemonic, `kmsAccount` from
+ *   `veranta-sdk/kms`)
  * - a viem `WalletClient` (browser wallets via wagmi)
- * - any custom object implementing {@link AvantisSigner}
+ * - any custom object implementing {@link VerantaSigner}
  */
 
 import type {
@@ -47,7 +48,7 @@ export interface SignedAuthorization {
 }
 
 /** Minimal signer surface consumed by the SDK. */
-export interface AvantisSigner {
+export interface VerantaSigner {
   readonly address: Address;
   /** True when the signer can produce EIP-7702 authorizations (local keys). */
   readonly canSignAuthorization: boolean;
@@ -66,7 +67,7 @@ export interface AvantisSigner {
 }
 
 /** Anything `toSigner` can adapt. */
-export type SignerSource = Hex | LocalAccount | WalletClient | AvantisSigner;
+export type SignerSource = Hex | LocalAccount | WalletClient | VerantaSigner;
 
 /** Normalize a 65-byte signature so v is 27/28 (some wallets return 0/1). */
 export function normalizeSignature(signature: Hex): Hex {
@@ -93,7 +94,7 @@ function toSignedAuthorization(
   };
 }
 
-class AccountSigner implements AvantisSigner {
+class AccountSigner implements VerantaSigner {
   readonly canSignAuthorization = true;
   readonly canSendTransaction = false;
 
@@ -145,7 +146,7 @@ class AccountSigner implements AvantisSigner {
   }
 }
 
-class WalletClientSigner implements AvantisSigner {
+class WalletClientSigner implements VerantaSigner {
   constructor(private readonly client: WalletClient) {
     if (!client.account) {
       throw new ConfigError(
@@ -227,12 +228,12 @@ function isHexKey(source: SignerSource): source is Hex {
   return typeof source === "string" && source.startsWith("0x") && source.length === 66;
 }
 
-function isAvantisSigner(source: SignerSource): source is AvantisSigner {
+function isVerantaSigner(source: SignerSource): source is VerantaSigner {
   return (
     typeof source === "object" &&
     source !== null &&
     "canSignAuthorization" in source &&
-    typeof (source as AvantisSigner).signTypedData === "function"
+    typeof (source as VerantaSigner).signTypedData === "function"
   );
 }
 
@@ -255,12 +256,12 @@ function isWalletClient(source: SignerSource): source is WalletClient {
 }
 
 /** Adapt any {@link SignerSource} into the SDK's signer interface. */
-export function toSigner(source: SignerSource): AvantisSigner {
+export function toSigner(source: SignerSource): VerantaSigner {
   if (isHexKey(source)) return new AccountSigner(privateKeyToAccount(source));
-  if (isAvantisSigner(source)) return source;
+  if (isVerantaSigner(source)) return source;
   if (isLocalAccount(source)) return new AccountSigner(source);
   if (isWalletClient(source)) return new WalletClientSigner(source);
   throw new ConfigError(
-    "Unsupported signer: pass a 0x private key, a viem LocalAccount, a viem WalletClient, or an AvantisSigner implementation",
+    "Unsupported signer: pass a 0x private key, a viem LocalAccount, a viem WalletClient, or an VerantaSigner implementation",
   );
 }

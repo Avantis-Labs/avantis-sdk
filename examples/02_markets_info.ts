@@ -1,8 +1,8 @@
 /** Pair catalog: symbols, leverage envelopes, fees, OI. */
 
-import { Avantis, isUpside, pairSymbol } from "avantis-sdk";
+import { Veranta, isUpside, pairSymbol } from "veranta-sdk";
 
-const client = new Avantis();
+const client = new Veranta();
 
 const pairs = await client.markets.pairs();
 console.log(`listed pairs: ${pairs.size}`);

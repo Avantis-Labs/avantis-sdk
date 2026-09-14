@@ -1,5 +1,5 @@
 /**
- * End-to-end test against the Avantis TESTNET (internal Base fork).
+ * End-to-end test against the Veranta TESTNET (internal Base fork).
  *
  * Fully self-contained: generates a fresh wallet, funds it through the
  * fork's dev faucet, then exercises every transport the SDK has —
@@ -7,14 +7,14 @@
  * (open + close with lifecycle events), core price-triggers (global TP),
  * and the read APIs.
  *
- * Gated: only runs with AVANTIS_E2E=1 (pnpm test:e2e). Never touches
+ * Gated: only runs with VERANTA_E2E=1 (pnpm test:e2e). Never touches
  * mainnet — network is hard-pinned to "testnet".
  */
 
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { beforeAll, describe, expect, it } from "vitest";
 import { findPosition, positionCollateral, positionTp } from "../../src/api/accountModels.js";
-import { Avantis } from "../../src/client.js";
+import { Veranta } from "../../src/client.js";
 import type { BatchedMarketEvent } from "../../src/execution/batchedMarket.js";
 import { fundTestnetWallet } from "../../src/testnet.js";
 
@@ -22,12 +22,12 @@ const PAIR = "ETH/USD";
 const COLLATERAL = 100;
 const LEVERAGE = 5;
 
-const run = process.env.AVANTIS_E2E === "1";
+const run = process.env.VERANTA_E2E === "1";
 
 describe.skipIf(!run)("testnet e2e (fresh wallet)", () => {
   const privateKey = generatePrivateKey();
   const wallet = privateKeyToAccount(privateKey);
-  let client: Avantis;
+  let client: Veranta;
   let pairIndex: number;
   let tradeIndex: number;
 
@@ -40,7 +40,7 @@ describe.skipIf(!run)("testnet e2e (fresh wallet)", () => {
       "usdc =",
       Number(funded.usdcRaw) / 1e6,
     );
-    client = new Avantis({ network: "testnet", signer: privateKey });
+    client = new Veranta({ network: "testnet", signer: privateKey });
     pairIndex = await client.markets.pairIndex(PAIR);
   }, 120_000);
 
