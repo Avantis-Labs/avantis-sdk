@@ -1,5 +1,15 @@
 # veranta-sdk
 
+## 0.3.0
+
+### Minor Changes
+
+- `compute.netPnl` and `compute.positionNetPnl` charge the close fee on the leveraged position by default, as the contract does. The previous behaviour, the web app's estimate that adds the gross PnL to the fee base, is available with `closeFeeBase: "notional_plus_pnl"`. Net PnL figures move by the gross PnL times the close fee rate.
+
+### Patch Changes
+
+- `compute.pairCloseMakerTakerFeeP` clamps the closed coin size to the closing side's open interest before blending the maker and taker rates, matching `PairStorageExtension.pairCloseFeeP` on chain.
+
 ## 0.2.1
 
 ### Patch Changes

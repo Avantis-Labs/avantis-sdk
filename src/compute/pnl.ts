@@ -66,16 +66,23 @@ export interface NetPnlBreakdown {
   net: number;
 }
 
+/** What the close fee is charged on: the leveraged position (the contract) or the web app's estimate that adds the gross PnL. */
+export type CloseFeeBase = "notional" | "notional_plus_pnl";
+
 /**
- * Unrealized net PnL breakdown for an open position (UI parity).
+ * Unrealized net PnL breakdown for an open position.
  *
  * - Fixed-fee (isUpside=false): net = gross - closingFee - rollover -
  *   funding + lossProtection (loss protection only offsets negative gross,
- *   capped).
+ *   capped). The closing fee is charged on the leveraged position, as the
+ *   contract does (`closeFeeBase: "notional"`, the default); pass
+ *   `"notional_plus_pnl"` to reproduce the web app's estimate, which adds the
+ *   gross PnL to the base.
  * - Upside (isUpside=true): net = gross * (1 - tieredFeeP/100) - rollover -
  *   funding.
  */
 export function netPnl(args: {
+  closeFeeBase?: CloseFeeBase;
   currentPrice: number;
   openPrice: number;
   collateral: number;
@@ -104,6 +111,7 @@ export function netPnl(args: {
     lossProtectionP = 0,
     pnlTierP = [],
     pnlFeesP = [],
+    closeFeeBase = "notional",
   } = args;
   const gross = grossPnl(currentPrice, openPrice, collateral, leverage, isLong);
 
@@ -122,7 +130,9 @@ export function netPnl(args: {
     };
   }
 
-  const closingFee = ((collateral * leverage + gross) * closeFeeP * (1 - feeDiscountP / 100)) / 100;
+  const feeBase =
+    closeFeeBase === "notional_plus_pnl" ? collateral * leverage + gross : collateral * leverage;
+  const closingFee = (feeBase * closeFeeP * (1 - feeDiscountP / 100)) / 100;
   let protection = 0;
   if (gross < 0 && lossProtectionP > 0) {
     protection = Math.min((-gross * lossProtectionP) / 100, (collateral * lossProtectionP) / 100);
@@ -143,9 +153,11 @@ export function positionNetPnl(
   position: Position,
   pairInfo: PairInfo,
   currentPrice: number,
+  options: { closeFeeBase?: CloseFeeBase } = {},
 ): NetPnlBreakdown {
   const lossProtectionTier = String(Number(position.lossProtection ?? "0"));
   return netPnl({
+    closeFeeBase: options.closeFeeBase,
     currentPrice,
     openPrice: positionOpenPrice(position),
     collateral: positionCollateral(position),

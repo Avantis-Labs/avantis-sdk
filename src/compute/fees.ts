@@ -108,16 +108,17 @@ export function pairCloseMakerTakerFeeP(args: {
   closeMakerFeeP: number;
   closeTakerFeeP: number;
 }): MakerTakerFee {
+  // The contract clamps the closed coin size to the closing side's open interest
+  // before the blend (PairStorageExtension.pairCloseFeeP), so a stale or partial
+  // snapshot never produces a size larger than the side being reduced.
+  const closingSide = args.isLong ? args.initialCoinOiLong : args.initialCoinOiShort;
+  const size = Math.min(args.positionSizeCoinOi, closingSide);
   return makerOrTakerFeeP(
-    args.isLong
-      ? Math.max(args.initialCoinOiLong - args.positionSizeCoinOi, 0)
-      : args.initialCoinOiLong,
-    args.isLong
-      ? args.initialCoinOiShort
-      : Math.max(args.initialCoinOiShort - args.positionSizeCoinOi, 0),
+    args.isLong ? args.initialCoinOiLong - size : args.initialCoinOiLong,
+    args.isLong ? args.initialCoinOiShort : args.initialCoinOiShort - size,
     args.initialCoinOiLong,
     args.initialCoinOiShort,
-    args.positionSizeCoinOi,
+    size,
     args.closeMakerFeeP,
     args.closeTakerFeeP,
   );
