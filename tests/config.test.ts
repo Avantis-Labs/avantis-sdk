@@ -43,6 +43,27 @@ describe("resolveConfig", () => {
     expect(resolveConfig({ network: "testnet", rpcUrl: "http://x" }).rpcUrl).toBe("http://x");
   });
 
+  it("reads VERANTA_* from an explicit env map instead of process.env", () => {
+    process.env.VERANTA_NETWORK = "testnet";
+    process.env.VERANTA_CORE_API_URL = "https://core.from-process";
+    const config = resolveConfig({
+      env: {
+        VERANTA_NETWORK: "mainnet",
+        VERANTA_CORE_API_URL: "http://core-backend-v2-app.avantis.svc.cluster.local:8080",
+      },
+    });
+    expect(config.network).toBe("mainnet");
+    expect(config.coreApiUrl).toBe("http://core-backend-v2-app.avantis.svc.cluster.local:8080");
+    // Fields the map leaves out fall back to the profile, never to process.env.
+    expect(config.twapApiUrl).toBe("https://prod-api.veranta.xyz/twap");
+    expect(resolveConfig({ env: {} }).network).toBe("mainnet");
+    expect(resolveConfig({ env: {} }).coreApiUrl).toBe("https://prod-api.veranta.xyz/core");
+    // Explicit options still win over the map.
+    expect(resolveConfig({ env: { VERANTA_NETWORK: "mainnet" }, network: "testnet" }).network).toBe(
+      "testnet",
+    );
+  });
+
   it("mainnet stays RPC-less by default", () => {
     expect(resolveConfig().rpcUrl).toBeUndefined();
   });

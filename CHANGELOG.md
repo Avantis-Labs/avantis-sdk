@@ -1,5 +1,11 @@
 # veranta-sdk
 
+## 0.3.1
+
+### Patch Changes
+
+- `new Veranta({ env })` reads the `VERANTA_*` settings (network, endpoint overrides, RPC, keys, builder code) from the given map instead of `process.env`, so one process can build clients for several networks with per network variables; an empty object isolates a client from the process environment.
+
 ## 0.3.0
 
 ### Minor Changes

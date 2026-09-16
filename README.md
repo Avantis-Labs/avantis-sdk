@@ -138,7 +138,9 @@ Constructor options > env vars > network profile (`mainnet` default,
 `VERANTA_TRADER_ADDRESS`, `VERANTA_NETWORK`, `VERANTA_EXECUTION`,
 `VERANTA_RPC_URL`, `VERANTA_BUILDER_CODE`, `VERANTA_BUILDER_FEE_PERCENT`,
 plus per-service URL overrides. Pre-rename `AVANTIS_*` names are still read
-when the `VERANTA_*` one is unset (with a console warning). See `src/config.ts`.
+when the `VERANTA_*` one is unset (with a console warning). `new Veranta({ env })`
+reads them from a map of your own instead of `process.env`, for processes that
+serve several networks with per network variables. See `src/config.ts`.
 
 ## Builder codes
 

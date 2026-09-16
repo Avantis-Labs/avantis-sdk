@@ -147,6 +147,15 @@ export interface VerantaConfigInput {
    */
   rpcUrl?: string;
 
+  /**
+   * Environment the SDK reads its `VERANTA_*` settings from (network, endpoint
+   * overrides, RPC, keys, builder code). Defaults to `process.env`. Pass a map
+   * when one process serves several networks with per network variables, so a
+   * client built for one network never picks up another network's URLs; an
+   * empty object isolates the client from the process environment entirely.
+   */
+  env?: Record<string, string | undefined>;
+
   // service endpoints
   network?: "mainnet" | "testnet";
   apiBaseUrl?: string;
@@ -236,28 +245,38 @@ const warnedLegacyEnv = new Set<string>();
  * deployments keep working through the rename (one console warning per
  * variable). The new name always wins when both are set.
  */
-function env(name: string): string | undefined {
+type EnvSource = Record<string, string | undefined>;
+
+function processEnv(): EnvSource | undefined {
   if (typeof process === "undefined" || !process.env) return undefined;
-  const value = process.env[name];
-  if (value) return value;
-  if (name.startsWith("VERANTA_")) {
-    const legacy = `${LEGACY_ENV_PREFIX}${name.slice("VERANTA_".length)}`;
-    const fallback = process.env[legacy];
-    if (fallback) {
-      if (!warnedLegacyEnv.has(legacy)) {
-        warnedLegacyEnv.add(legacy);
-        console.warn(
-          `[veranta-sdk] ${legacy} is deprecated (Avantis is now Veranta); set ${name} instead.`,
-        );
+  return process.env;
+}
+
+function envReader(source: EnvSource | undefined): (name: string) => string | undefined {
+  return (name) => {
+    if (!source) return undefined;
+    const value = source[name];
+    if (value) return value;
+    if (name.startsWith("VERANTA_")) {
+      const legacy = `${LEGACY_ENV_PREFIX}${name.slice("VERANTA_".length)}`;
+      const fallback = source[legacy];
+      if (fallback) {
+        if (!warnedLegacyEnv.has(legacy)) {
+          warnedLegacyEnv.add(legacy);
+          console.warn(
+            `[veranta-sdk] ${legacy} is deprecated (Avantis is now Veranta); set ${name} instead.`,
+          );
+        }
+        return fallback;
       }
-      return fallback;
     }
-  }
-  return undefined;
+    return undefined;
+  };
 }
 
 /** Build config from explicit options + env + network profile. */
 export function resolveConfig(input: VerantaConfigInput = {}): VerantaConfig {
+  const env = envReader(input.env ?? processEnv());
   const network = input.network ?? (env("VERANTA_NETWORK") as "mainnet" | "testnet") ?? "mainnet";
   const profile = PROFILES[network];
   if (!profile) {
