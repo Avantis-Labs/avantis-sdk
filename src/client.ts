@@ -40,6 +40,13 @@ export interface VerantaOptions extends VerantaConfigInput {
    * Falls back to `privateKey` / VERANTA_PRIVATE_KEY.
    */
   signer?: SignerSource;
+  /**
+   * Custom fetch used for every HTTP call the SDK makes (history API, feed,
+   * transaction builder, relayer). Use it to route through a proxy, add
+   * headers for a private gateway, or record requests in tests. Defaults to
+   * the global fetch.
+   */
+  fetch?: typeof fetch;
 }
 
 export class Veranta {
@@ -58,12 +65,12 @@ export class Veranta {
   private lpApi?: LpApi;
 
   constructor(options: VerantaOptions = {}) {
-    const { signer, ...configInput } = options;
+    const { signer, fetch: fetchFn, ...configInput } = options;
     this.config = resolveConfig(configInput);
     const source = signer ?? this.config.privateKey;
     this.signer = source !== undefined ? toSigner(source) : undefined;
 
-    this.transport = new HttpTransport({ timeoutMs: this.config.timeoutMs });
+    this.transport = new HttpTransport({ timeoutMs: this.config.timeoutMs, fetch: fetchFn });
     this.txb = new TxBuilderClient(this.transport, this.config.txBuilderUrl);
     this.engine = new ExecutionEngine(this.config, this.signer, this.transport, this.txb);
   }

@@ -96,7 +96,7 @@ export const TESTNET: NetworkProfile = {
  * testnet profile so trader-EOA flows (EIP-7702 auth nonce, direct mode)
  * work out of the box.
  */
-export const TESTNET_RPC_URL = "https://base-testnet-rpc-ovh.avantisfi.com";
+export const TESTNET_RPC_URL = "https://devnet-rpc.veranta.xyz";
 
 export const MAINNET: NetworkProfile = {
   name: "mainnet",

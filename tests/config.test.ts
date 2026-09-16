@@ -39,7 +39,7 @@ describe("resolveConfig", () => {
     expect(config.coreApiUrl).toBe("https://staging-api.veranta.xyz/core");
     expect(config.pusherKey).toBe("f86bc7e9919fc938694a");
     // Testnet DX: the public fork RPC is defaulted in (explicit still wins).
-    expect(config.rpcUrl).toBe("https://base-testnet-rpc-ovh.avantisfi.com");
+    expect(config.rpcUrl).toBe("https://devnet-rpc.veranta.xyz");
     expect(resolveConfig({ network: "testnet", rpcUrl: "http://x" }).rpcUrl).toBe("http://x");
   });
 

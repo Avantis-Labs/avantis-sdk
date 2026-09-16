@@ -37,7 +37,7 @@ import { JsonRpcClient } from "./execution/rpc.js";
 import type { Num } from "./types.js";
 
 /** Block explorer for the fork. */
-export const TESTNET_EXPLORER_URL = "https://base-testnet-ovh.avantisfi.com";
+export const TESTNET_EXPLORER_URL = "https://devnet-explorer.veranta.xyz";
 
 /** USDC on Base (identical address on the fork). */
 const USDC: Address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";

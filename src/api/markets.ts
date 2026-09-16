@@ -244,6 +244,9 @@ export class MarketsApi {
       orderType: orderTypeInt,
     };
     if (args.wantedPrice !== undefined) body.wantedPrice10 = toRaw10(args.wantedPrice);
+    // The engine applies the pair's leverage-tiered spread cap only when the
+    // request carries a leverage; without it the flat cap applies.
+    if (args.leverage !== undefined) body.leverage10 = toRaw10(args.leverage);
 
     const data = await this.transport.json("POST", `${this.cfg.riskV2ApiUrl}/spread`, {
       json: body,

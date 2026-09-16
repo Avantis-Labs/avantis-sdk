@@ -1,5 +1,13 @@
 # veranta-sdk
 
+## 0.2.1
+
+### Patch Changes
+
+- `new Veranta({ fetch })` accepts a custom fetch function that is used for every HTTP call the SDK makes: route requests through a proxy, add headers for a private gateway, or record requests in tests.
+- `markets.spread()` sends `leverage10` when a leverage is given, so the risk engine can apply the pair's leverage-tiered spread cap instead of the flat cap.
+- Testnet defaults move to the Veranta domain: RPC `https://devnet-rpc.veranta.xyz` (websocket `wss://devnet-wsrpc.veranta.xyz`) and explorer `https://devnet-explorer.veranta.xyz`. Explicit `rpcUrl` overrides keep working.
+
 ## 0.2.0
 
 ### Minor Changes
