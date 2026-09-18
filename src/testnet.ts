@@ -75,14 +75,14 @@ export interface FundTestnetWalletResult {
  * (defaults: 0.05 ETH, 1,000 USDC). Idempotent-ish: skips a leg when the
  * wallet already holds at least the requested amount.
  *
- * Testnet-only: throws unless the RPC URL contains "testnet".
+ * Testnet-only: throws unless the RPC URL contains "testnet" or "devnet".
  */
 export async function fundTestnetWallet(
   address: Address,
   options: { eth?: Num; usdc?: Num; rpcUrl?: string } = {},
 ): Promise<FundTestnetWalletResult> {
   const rpcUrl = options.rpcUrl ?? TESTNET_RPC_URL;
-  if (!/testnet/i.test(rpcUrl)) {
+  if (!/testnet|devnet/i.test(rpcUrl)) {
     throw new ConfigError(
       `fundTestnetWallet only works against the Veranta testnet fork (got ${rpcUrl})`,
     );
