@@ -53,6 +53,7 @@
   },
   "files": [
     "dist",
+    "LICENSE",
     "AGENTS.md",
     "llms.txt",
     "README.md"
