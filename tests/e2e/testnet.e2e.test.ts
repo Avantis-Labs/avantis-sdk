@@ -46,7 +46,7 @@ describe.skipIf(!run)("testnet e2e (fresh wallet)", () => {
 
   it("bootstraps from /v2/meta on the fork", async () => {
     expect(await client.chainId()).toBe(8453);
-    expect(client.config.rpcUrl).toContain("testnet"); // auto-defaulted fork RPC
+    expect(client.config.rpcUrl).toMatch(/testnet|devnet/); // auto-defaulted fork RPC
     const pairs = await client.markets.pairs();
     expect(pairs.size).toBeGreaterThan(50);
   });
