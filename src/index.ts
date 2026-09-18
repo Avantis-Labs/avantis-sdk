@@ -54,6 +54,7 @@ export {
   RpcError,
   SigningError,
   SimulationFailedError,
+  TestnetFaucetError,
   TransactionRevertedError,
   UpstreamError,
   ValidationError,

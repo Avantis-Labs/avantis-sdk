@@ -136,6 +136,14 @@ export class TransactionRevertedError extends VerantaError {
   }
 }
 
+/**
+ * The testnet faucet whale does not hold enough to serve the request. Top
+ * up the whale on the fork or request less; the transfer was not sent.
+ */
+export class TestnetFaucetError extends VerantaError {
+  override name = "TestnetFaucetError";
+}
+
 /** Delegation is missing, disabled, or expired for the configured signer. */
 export class DelegationError extends VerantaError {
   override name = "DelegationError";
