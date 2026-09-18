@@ -27,12 +27,13 @@ import {
   concatHex,
   encodeAbiParameters,
   keccak256,
+  formatUnits,
   numberToHex,
   parseUnits,
   stringToBytes,
 } from "viem";
 import { TESTNET_RPC_URL } from "./config.js";
-import { ConfigError } from "./errors.js";
+import { ConfigError, TestnetFaucetError } from "./errors.js";
 import { JsonRpcClient } from "./execution/rpc.js";
 import type { Num } from "./types.js";
 
@@ -46,6 +47,12 @@ const ETH_WHALE: Address = "0x3304E22DDaa22bCdC5fCa2269b418046aE7b566A";
 const USDC_WHALE: Address = "0x6c561B446416E1A00E8E93E221854d6eA4171372";
 
 const TRANSFER_SELECTOR = keccak256(stringToBytes("transfer(address,uint256)")).slice(0, 10) as Hex;
+const BALANCE_OF_SELECTOR = keccak256(stringToBytes("balanceOf(address)")).slice(0, 10) as Hex;
+
+async function usdcBalanceOf(rpc: JsonRpcClient, holder: Address): Promise<bigint> {
+  const data = concatHex([BALANCE_OF_SELECTOR, encodeAbiParameters([{ type: "address" }], [holder])]);
+  return BigInt((await rpc.call("eth_call", [{ to: USDC, data }, "latest"])) ?? "0x0");
+}
 
 async function impersonate(
   rpc: JsonRpcClient,
@@ -75,14 +82,16 @@ export interface FundTestnetWalletResult {
  * (defaults: 0.05 ETH, 1,000 USDC). Idempotent-ish: skips a leg when the
  * wallet already holds at least the requested amount.
  *
- * Testnet-only: throws unless the RPC URL contains "testnet".
+ * Testnet-only: throws unless the RPC URL contains "testnet" or "devnet".
+ * Throws TestnetFaucetError, before sending anything, when a whale holds
+ * less than the requested amount.
  */
 export async function fundTestnetWallet(
   address: Address,
   options: { eth?: Num; usdc?: Num; rpcUrl?: string } = {},
 ): Promise<FundTestnetWalletResult> {
   const rpcUrl = options.rpcUrl ?? TESTNET_RPC_URL;
-  if (!/testnet/i.test(rpcUrl)) {
+  if (!/testnet|devnet/i.test(rpcUrl)) {
     throw new ConfigError(
       `fundTestnetWallet only works against the Veranta testnet fork (got ${rpcUrl})`,
     );
@@ -94,17 +103,25 @@ export async function fundTestnetWallet(
 
   const ethBalance = await rpc.getBalance(address);
   if (ethBalance < wantEthWei) {
+    const whaleEth = await rpc.getBalance(ETH_WHALE);
+    if (whaleEth < wantEthWei) {
+      throw new TestnetFaucetError(
+        `testnet faucet drained: ETH whale ${ETH_WHALE} holds ${formatUnits(whaleEth, 18)} ETH, ` +
+          `requested ${formatUnits(wantEthWei, 18)}`,
+      );
+    }
     txHashes.push(await impersonate(rpc, { from: ETH_WHALE, to: address, value: wantEthWei }));
   }
 
-  const balanceOfData = concatHex([
-    keccak256(stringToBytes("balanceOf(address)")).slice(0, 10) as Hex,
-    encodeAbiParameters([{ type: "address" }], [address]),
-  ]);
-  const usdcBalance = BigInt(
-    (await rpc.call("eth_call", [{ to: USDC, data: balanceOfData }, "latest"])) ?? "0x0",
-  );
+  const usdcBalance = await usdcBalanceOf(rpc, address);
   if (usdcBalance < wantUsdcRaw) {
+    const whaleUsdc = await usdcBalanceOf(rpc, USDC_WHALE);
+    if (whaleUsdc < wantUsdcRaw) {
+      throw new TestnetFaucetError(
+        `testnet faucet drained: USDC whale ${USDC_WHALE} holds ${formatUnits(whaleUsdc, 6)} USDC, ` +
+          `requested ${formatUnits(wantUsdcRaw, 6)}`,
+      );
+    }
     const transferData = concatHex([
       TRANSFER_SELECTOR,
       encodeAbiParameters([{ type: "address" }, { type: "uint256" }], [address, wantUsdcRaw]),
@@ -115,9 +132,7 @@ export async function fundTestnetWallet(
   return {
     address,
     ethWei: await rpc.getBalance(address),
-    usdcRaw: BigInt(
-      (await rpc.call("eth_call", [{ to: USDC, data: balanceOfData }, "latest"])) ?? "0x0",
-    ),
+    usdcRaw: await usdcBalanceOf(rpc, address),
     txHashes,
   };
 }
