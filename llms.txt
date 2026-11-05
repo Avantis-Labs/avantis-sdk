@@ -41,4 +41,10 @@
   and traders approve USDC to the BuilderCode registry
   (`account.approveBuilderFees`) besides TradingStorage. Owners register
   caps with `account.registerBuilderCode`; lookup `account.builderCode`.
+- Base Denim (mainnet 2026-11-05 18:00 UTC): 200 ms blocks, no Flashblocks.
+  Receipt polls default to 250 ms; `ExecutionConfirmedInFlashblock` is
+  deprecated (never emitted); the `pending` nonce tag still works but no
+  longer means preconfirmed; a position's whole-second `Trade.timestamp` can
+  repeat for a close + reopen of one slot, so re-request intents bound to it
+  (`closeTrade`, `closeTradeCoin`, `partialTpSl`) after any same-second change.
 - Never bypass the digest assert in signing; never rename EIP-712 fields.

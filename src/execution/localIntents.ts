@@ -316,6 +316,16 @@ export class LocalIntentBuilder {
     });
   }
 
+  /**
+   * Close (part of) a position for a USDC amount.
+   *
+   * `openTimestamp` is the position's `Trade.timestamp`, a WHOLE second. Since
+   * Denim (200 ms blocks, 2026-11-05 18:00 UTC) a close and a reopen of the
+   * same slot (`pairIndex`, `index`) can land inside one second, so the old
+   * and the new position can share it. After ANY same-second change to the
+   * slot, re-read the position and re-request the intent (build and sign it
+   * again); never reuse one signed before the change.
+   */
   closeTrade(args: {
     trader: Address;
     pairIndex: number;
@@ -338,7 +348,12 @@ export class LocalIntentBuilder {
     });
   }
 
-  /** Close a fixed base-asset exposure instead of a USDC amount. */
+  /**
+   * Close a fixed base-asset exposure instead of a USDC amount.
+   *
+   * `openTimestamp` carries the same-second caveat described on `closeTrade`:
+   * re-request the intent after any same-second change to the slot.
+   */
   closeTradeCoin(args: {
     trader: Address;
     pairIndex: number;
@@ -457,6 +472,11 @@ export class LocalIntentBuilder {
    * NO deadline by design; freshness comes from `signTimestamp` (ms, must
    * not be in the future). The signed order is stored OFF-CHAIN via the
    * core API /price-triggers; building/signing alone does nothing.
+   *
+   * `openTimestamp` is the position's whole-second `Trade.timestamp`, so the
+   * same-second caveat described on `closeTrade` applies: after any
+   * same-second change to the slot (a close and reopen, an increase),
+   * re-request the order instead of reusing one signed before the change.
    */
   partialTpSl(args: {
     trader: Address;

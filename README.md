@@ -142,6 +142,31 @@ when the `VERANTA_*` one is unset (with a console warning). `new Veranta({ env }
 reads them from a map of your own instead of `process.env`, for processes that
 serve several networks with per network variables. See `src/config.ts`.
 
+## Base Denim (200 ms blocks)
+
+Base's Denim upgrade goes live on mainnet on 2026-11-05 at 18:00 UTC: a block
+every 200 ms (five per second), block timestamps still whole seconds, and
+Flashblocks are gone. What changes for this SDK:
+
+- **Receipts arrive in about 200 ms.** `JsonRpcClient.waitForReceipt(txHash,
+  timeoutMs, pollMs)`, which direct mode uses to wait for your transaction,
+  polls every 250 ms by default; pass `pollMs` for another interval, for
+  example a larger one on a rate-limited public RPC. `useSessionKey().enable()`
+  polls the new delegation every 500 ms.
+- **`ExecutionConfirmedInFlashblock` is deprecated.** The order event stream
+  never receives it again; if one ever arrives it is still forwarded
+  unchanged. Wait for `OrderFilled` or `OrderCanceled` instead.
+- **The `pending` block tag still works but no longer means preconfirmed.**
+  Nonce reads (the RPC client's `getTransactionCount`, viem's default) keep
+  using it and need no change. Do not read it as proof that an earlier
+  transaction landed; wait for that transaction's receipt.
+- **A position's `Trade.timestamp` can repeat.** It is a whole second, and a
+  close and a reopen of the same slot can now land inside one second, so the
+  old and the new position can share it. Re-request intents bound to the
+  position's timestamp (`closeTrade`, `closeTradeCoin`, `partialTpSl` on
+  `client.localIntents()`) after any same-second change to the slot: re-read
+  the position, then build and sign the intent again.
+
 ## Builder codes
 
 A builder code attributes order flow to your integration and charges a
