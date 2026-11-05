@@ -112,8 +112,10 @@ export function useSessionKey(): UseSessionKeyResult {
           expiry,
           toSigner(walletClient),
         );
-        // Poll until the delegation is live (indexing the relay takes a
-        // couple of blocks).
+        // Poll until the delegation is live. The relayed transaction lands
+        // in the next block (a new one every 200 ms since Denim, 2026-11-05
+        // 18:00 UTC); what is left is the tx-builder indexing it. Poll every
+        // 500 ms and give up after 60 s.
         const deadline = Date.now() + 60_000;
         while (Date.now() < deadline) {
           const delegation = await sessionClient.txb.delegation(address, account.address);
@@ -123,7 +125,7 @@ export function useSessionKey(): UseSessionKeyResult {
             void queryClient.invalidateQueries({ queryKey: verantaKeys.all });
             return active;
           }
-          await new Promise((resolve) => setTimeout(resolve, 2_000));
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
         throw new ConfigError(
           "Delegation transaction relayed but not visible yet; retry enable() in a moment",

@@ -9,6 +9,13 @@ import { RpcError, TransactionRevertedError } from "../errors.js";
 
 let nextId = 1;
 
+/**
+ * Default `waitForReceipt` poll interval. Base produces a block every 200 ms
+ * since Denim (mainnet, 2026-11-05 18:00 UTC), so 250 ms finds a receipt
+ * within about one block of it landing.
+ */
+const DEFAULT_RECEIPT_POLL_MS = 250;
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -49,6 +56,14 @@ export class JsonRpcClient {
     return Number.parseInt(await this.call("eth_chainId"), 16);
   }
 
+  /**
+   * Account nonce at `block`. The default stays `"pending"` on purpose.
+   *
+   * Denim (Base mainnet, 2026-11-05 18:00 UTC) removes Flashblocks. The
+   * `pending` tag still works, but it no longer means "preconfirmed": do not
+   * read it as proof that an earlier transaction landed. Wait for that
+   * transaction's receipt (`waitForReceipt`, about 200 ms) when order matters.
+   */
   async getTransactionCount(address: string, block = "pending"): Promise<number> {
     return Number.parseInt(await this.call("eth_getTransactionCount", [address, block]), 16);
   }
@@ -86,10 +101,17 @@ export class JsonRpcClient {
     return await this.call("eth_getTransactionReceipt", [txHash]);
   }
 
+  /**
+   * Poll `eth_getTransactionReceipt` until the transaction is mined.
+   *
+   * `pollMs` defaults to 250 ms (one 200 ms Base block, rounded up). Raise it
+   * for a rate-limited public RPC. Throws `TransactionRevertedError` for a
+   * failed receipt and `RpcError` once `timeoutMs` (default 120 s) has passed.
+   */
   async waitForReceipt(
     txHash: string,
     timeoutMs = 120_000,
-    pollMs = 1_000,
+    pollMs = DEFAULT_RECEIPT_POLL_MS,
   ): Promise<Record<string, any>> {
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {

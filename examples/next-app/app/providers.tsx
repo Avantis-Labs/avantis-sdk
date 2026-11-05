@@ -19,6 +19,7 @@ import { injected } from "wagmi/connectors";
 const wagmiConfig = createConfig({
   chains: [base],
   connectors: [injected()],
+  // viem reads nonces at "pending". Denim keeps it working, but it no longer means preconfirmed.
   transports: { [base.id]: http() },
   // Testnet (Veranta Base fork, same chainId): point BOTH layers at it,
   //   transports: { [base.id]: http(TESTNET_RPC_URL) }   (TESTNET_RPC_URL from "veranta-sdk")
